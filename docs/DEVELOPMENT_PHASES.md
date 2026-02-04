@@ -51,10 +51,11 @@ npm install helmet @nestjs/throttler              # Security hardening
 | Collection | Index | Type |
 |------------|-------|------|
 | `companies` | `companyId` | Unique |
-| `companies` | `assetClass` | Query |
+| `companies` | `assetClasses` | Multikey (array) |
 | `companies` | `industry` | Query |
-| `companies` | `regions.region` | Query |
+| `companies` | `region` | Query |
 | `companies` | `name` | Text (optional) |
+| `companies` | `nameSort` | Sort (optional) |
 
 ### Quality & DevX
 
@@ -79,14 +80,14 @@ OPENAI_API_KEY=
 
 ---
 
-## �📋 Definition of Done (Final Acceptance Checklist)
+## Definition of Done (Final Acceptance Checklist)
 
 Before submitting, verify ALL of these with the provided commands:
 
 | Requirement | Verify Command | Expected Result |
 |-------------|----------------|------------------|
 | Ingests ALL companies | `npm run ingest` | `fetched == sourceTotal` (where `sourceTotal` comes from API response) |
-| Required fields stored | `npm run verify:data` | 0 companies missing name/assetClass/industry/regions |
+| Required fields stored | `npm run verify:data` | 0 companies missing name/assetClasses/industry/region |
 | Well-structured schema | Check `src/companies/schemas/` | Indexes defined, types explicit |
 | Idempotent ingestion | Run `npm run ingest` twice | Second run shows updates, not new inserts |
 | REST API works | `curl localhost:3000/companies` | Returns `{ items: [...], page, limit, total }` |
@@ -95,41 +96,63 @@ Before submitting, verify ALL of these with the provided commands:
 | README complete | Read `README.md` | Setup → Ingest → Query flow is clear |
 | Clean git history | `git log --oneline` | Meaningful commit messages |
 
-> **Note on "ALL companies"**: The API response typically includes a `total`, `count`, or `totalResults` field. Store this in `IngestionRun.sourceMeta.totalFromSource` and verify `fetched == totalFromSource`.
+> **Note on "ALL companies"**: The KKR API uses `hits` as the total company count (currently 296). Store `hits` in `IngestionRun.sourceMeta.totalFromSource` and `pages` in `sourceMeta.pagesFromSource`. Verify `fetched == totalFromSource`.
 
 ---
 
-## 🔴 PHASE 0 — Source Reconnaissance (DO THIS FIRST)
+## ✅ PHASE 0 — Source Reconnaissance (COMPLETE)
 
 **Goal**: Understand exactly how KKR serves portfolio data before writing any code.
 
-### Why This Matters
-The entire architecture depends on knowing:
-- Is there a JSON API? (almost certainly yes)
-- How does pagination work?
-- What fields are available?
+**Status**: ✅ **COMPLETE** — See `docs/source-analysis.md` for full details.
 
-### Tasks
+### Key Findings Summary
 
-- [ ] Open https://www.kkr.com/invest/portfolio in Chrome
-- [ ] Open DevTools → Network tab → filter by "Fetch/XHR"
-- [ ] Interact with the page (scroll, filter, paginate)
-- [ ] Identify the API endpoint(s) that return company data
-- [ ] Document findings:
+| Item | Discovery |
+|------|----------|
+| **API Endpoint** | `GET https://www.kkr.com/content/kkr/sites/global/en/invest/portfolio/jcr:content/root/main-par/bioportfoliosearch.bioportfoliosearch.json` |
+| **Method** | GET |
+| **Auth Required** | None |
+| **Pagination** | Page-based (`?page=1`), 15 items/page (fixed), read `pages` from response |
+| **Total Companies** | 296 (as of 2026-02-03, read from `hits` field) |
+| **Unique ID** | ⚠️ None provided — use deterministic hash (`kkrKey`) |
 
+### API Response Fields
+
+```typescript
+interface KkrApiResponse {
+  success: boolean;
+  hits: number;      // Total companies (e.g., 296)
+  pages: number;     // Total pages (e.g., 20)
+  results: PortfolioCompany[];
+}
+
+interface PortfolioCompany {
+  name: string;           // Company name
+  assetClass: string;     // May contain multiple (comma-separated)
+  industry: string;
+  region: string;         // Single string, NOT an array!
+  hq: string;             // Headquarters
+  yoi: string;            // Year of Investment
+  url: string;            // Website (may be empty)
+  description: string;    // ⚠️ Contains HTML markup!
+  logo: string;           // Relative path
+  // Optional:
+  relatedLinkOne?: string;
+  relatedLinkOneTitle?: string;
+}
 ```
-Endpoint: _______________
-Method: GET / POST
-Headers required: _______________
-Pagination: (offset/limit, cursor, page number?)
-Response shape: (copy a sample item)
-```
 
-- [ ] Check if company detail pages exist and have extra data
-- [ ] Identify a **unique identifier** for each company (ID, slug, URL)
+### ⚠️ Critical Notes from Recon
+
+1. **`limit` parameter is IGNORED** — API always returns 15 items per page
+2. **`region` is a single string**, not an array (e.g., `"Americas"`, `"Asia Pacific"`)
+3. **No unique ID provided** — must generate `companyId` via hash
+4. **`description` contains HTML** — sanitize before display
+5. **Do NOT store `sortingName`** — it changes based on sort parameter
 
 ### Deliverable
-- [ ] Create `docs/source-analysis.md` with your findings
+- [x] Created `docs/source-analysis.md` with full findings
 
 ---
 
@@ -283,26 +306,35 @@ git commit -m "feat: add NestJS skeleton with config, MongoDB, logging"
 Create `src/companies/schemas/company.schema.ts`:
 
 ```typescript
-// Required fields (from challenge)
-- companyId: string      // unique, indexed — MUST be stable (see below)
+// Required fields (from KKR API — verified in source-analysis.md)
+- companyId: string        // unique, indexed — deterministic hash (see below)
 - name: string
-- assetClass: string     // indexed
-- industry: string       // indexed  
-- regions: { region: string; share?: number }[]  // indexed on 'regions.region'
+- nameSort: string         // Computed: name.toLowerCase() for fast sorting
+- assetClassRaw: string    // Raw from API (may be comma-separated, e.g., "Global Impact, Private Equity")
+- assetClasses: string[]   // Computed: split by comma, trimmed — indexed (multikey)
+- industry: string         // indexed  
+- region: string           // indexed — single string from API (e.g., "Americas")
 
-// Optional enrichment fields
-- description?: string
-- website?: string
-- headquarters?: string
-- logoUrl?: string
+// Additional fields from API (all available in list endpoint!)
+- descriptionHtml?: string  // Raw HTML from API (e.g., "<p>Digital insurance...</p>")
+- descriptionText?: string  // Computed: HTML-stripped for search/display
+- website?: string          // From `url` field — normalized (add https:// if missing)
+- headquarters?: string     // From `hq` field
+- yearOfInvestment?: string // From `yoi` field
+- logoPath?: string         // Raw from API (relative path)
+- logoUrl?: string          // Computed: "https://www.kkr.com" + logoPath
+
+// Optional related links (present on some companies)
+- relatedLinks?: {
+    linkOne?: { url: string; title: string };      // Usually press releases
+    linkTwo?: { urlOrId: string; title: string };  // Can be URL OR video ID (treat as string)
+  }
 
 // Source metadata (production-ready provenance)
 - source: {
-    listUrl: string       // e.g., "https://www.kkr.com/invest/portfolio"
-    detailUrl?: string    // company detail page if exists
-    endpoint?: string     // API endpoint used
+    listUrl: string       // "https://www.kkr.com/invest/portfolio"
+    endpoint: string      // Full API endpoint URL
     fetchedAt: Date       // when this record was last fetched
-    asOf?: string         // "as of" date if visible on site
   }
 
 // Timestamps (Mongoose handles these)
@@ -310,24 +342,50 @@ Create `src/companies/schemas/company.schema.ts`:
 - updatedAt: Date
 ```
 
+> ⚠️ **Do NOT store API's `sortingName` field!** It changes based on `sortParameter` used in the request. Use your own computed `nameSort` instead.
+
 #### Unique Key Strategy (Critical!)
 
-Priority order for `companyId`:
-1. **Stable ID from API response** (best) — e.g., `"kkr-12345"`
-2. **Canonical detail URL slug** — e.g., `"acme-corp"` from `/portfolio/acme-corp`
-3. **Derived hash** — `sha256(name + detailUrl)` as last resort
+**The KKR API does NOT provide a unique ID.** Use a deterministic hash:
+
+```typescript
+import { createHash } from 'crypto';
+
+function generateCompanyId(company: PortfolioCompany): string {
+  // Combine stable fields to create collision-resistant key
+  // Use raw assetClass (before splitting) for consistency
+  const normalized = [
+    company.name.toLowerCase().trim(),
+    company.yoi,
+    company.hq.toLowerCase().trim(),
+    company.assetClass.toLowerCase().trim(),  // assetClassRaw
+    company.industry.toLowerCase().trim()
+  ].join('|');
+  
+  return createHash('sha256').update(normalized).digest('hex').substring(0, 32);
+}
+```
 
 > ⚠️ **Never use name alone** — names can change or have duplicates.
+> 
+> ⚠️ **Limitation**: If KKR changes a company's name or other fields, the hash will change.
+>
+> 💡 **Tip**: You can also generate a human-readable `slug` (e.g., `"plus-simple"` from `"+Simple"`) for display URLs, but use `companyId` hash as the primary key.
 
-#### Region Distribution Decision
+#### Region Data Note
 
-We use `{ region: string; share?: number }[]` because:
-- Handles simple case: `[{ region: "Americas" }, { region: "Europe" }]`
-- Future-proof if shares exist: `[{ region: "Americas", share: 60 }, { region: "Europe", share: 40 }]`
-- Stats endpoint computes distribution as counts by region
+The API returns `region` as a **single string** (not an array):
+- `"Americas"` (123 companies)
+- `"Asia Pacific"` (93 companies)
+- `"Europe, The Middle East And Africa"` (79 companies)
+- `"Japan"` (1 company — SmartHR only)
+
+Stats endpoint computes distribution by counting companies per region value.
 
 - [ ] Add unique index on `companyId`
-- [ ] Add query indexes on `assetClass`, `industry`, `regions.region`
+- [ ] Add multikey index on `assetClasses` (array field)
+- [ ] Add query indexes on `industry`, `region`
+- [ ] Add sort index on `nameSort` (optional, for fast alphabetical queries)
 
 ### 3.2 Ingestion Run Schema (Recommended)
 
@@ -350,7 +408,8 @@ Create `src/ingestion/schemas/ingestion-run.schema.ts`:
 - sourceMeta: {
     listUrl: string           // main portfolio URL
     endpointUsed: string      // actual API endpoint
-    totalFromSource: number   // total count from API (for verification)
+    totalFromSource: number   // `hits` from API response (e.g., 296)
+    pagesFromSource: number   // `pages` from API response (e.g., 20)
     asOf?: string             // "as of" date if visible
     scopeNote?: string        // e.g., "Portfolio of KKR General Partner only"
   }
@@ -399,11 +458,16 @@ Create `src/ingestion/kkr-client/kkr.client.ts`:
 npm install undici p-retry p-limit
 ```
 
-- [ ] Implement `fetchPortfolioPage(offset, limit)` or equivalent
+- [ ] Implement `fetchPortfolioPage(pageNumber: number)` — **page-based, NOT offset/limit**
+  ```typescript
+  // API uses page-based pagination (1-indexed)
+  // The `limit` parameter is IGNORED — always returns 15 items
+  const url = `${BASE_ENDPOINT}?page=${pageNumber}&sortParameter=name&sortingOrder=asc`;
+  ```
 - [ ] **Set proper headers**:
   ```typescript
   headers: {
-    'User-Agent': 'PortfoRadar/1.0 (coding-challenge)',
+    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
     'Accept': 'application/json',
   }
   ```
@@ -418,7 +482,20 @@ Create `src/ingestion/mappers/company.mapper.ts`:
 
 - [ ] `mapRawToCompany(rawItem): CompanyDto`
 - [ ] Handle missing fields gracefully
-- [ ] Generate `companyId` from source ID or slug
+- [ ] Generate `companyId` using deterministic hash
+- [ ] Compute derived fields:
+  ```typescript
+  // Split asset classes
+  assetClassRaw: raw.assetClass,
+  assetClasses: raw.assetClass.split(',').map(s => s.trim()),
+  
+  // Normalize/compute
+  nameSort: raw.name.toLowerCase(),
+  descriptionHtml: raw.description,
+  descriptionText: stripHtml(raw.description),
+  website: normalizeUrl(raw.url),  // add https:// if missing
+  logoUrl: raw.logo ? `https://www.kkr.com${raw.logo}` : undefined,
+  ```
 
 ### 4.3 Portfolio Ingestion Service
 
@@ -443,8 +520,8 @@ Same company may appear across pages/filters. Handle with **two layers**:
 2. **DB upsert + unique index** — guarantees no duplicates even if Set fails
 
 - [ ] **Critical**: Do NOT let one company failure crash entire run
-- [ ] Log progress: "Fetched page 1/N", "Upserted company X"
-- [ ] Log summary at end: "Ingestion complete: 150 fetched, 145 created, 5 updated, 0 failed"
+- [ ] Log progress: "Fetched page 1/20", "Upserted company X"
+- [ ] Log summary at end: "Ingestion complete: 296 fetched, 290 created, 6 updated, 0 failed"
 
 ### 4.4 Ingestion Command
 
@@ -505,21 +582,25 @@ Add npm script:
 Expected output:
 ```
 === Data Verification Report ===
-✓ Total companies: 150
-✓ Source total (from API): 150
+✓ Total companies: 296
+✓ Source total (from API): 296
 ✓ Missing required fields: 0
 ✓ Duplicate companyIds: 0
 
 --- Distribution Sanity Check ---
 By Asset Class:
-  Private Equity: 80
-  Infrastructure: 40
-  Real Estate: 30
+  Private Equity: 148
+  Infrastructure: 67
+  Tech Growth: 55
+  Health Care Growth: 30
+  Global Impact: 18
+  (Note: totals > 296 because some companies have multiple asset classes)
 
 By Region:
-  Americas: 90
-  Europe: 35
-  Asia Pacific: 25
+  Americas: 123
+  Asia Pacific: 93
+  Europe, The Middle East And Africa: 79
+  Japan: 1
 
 ✓ Data quality: PASS
 ```
@@ -611,9 +692,9 @@ app.useGlobalPipes(new ValidationPipe({
 Build the DB query yourself from validated DTO fields:
 ```typescript
 const mongoFilter = {};
-if (dto.assetClass) mongoFilter.assetClass = dto.assetClass;
+if (dto.assetClass) mongoFilter.assetClasses = dto.assetClass;  // matches any element in array
 if (dto.industry) mongoFilter.industry = dto.industry;
-if (dto.region) mongoFilter['regions.region'] = dto.region;
+if (dto.region) mongoFilter.region = dto.region;  // region is a single string
 ```
 
 ### 5.4 Stats Endpoint
@@ -621,10 +702,10 @@ if (dto.region) mongoFilter['regions.region'] = dto.region;
 `GET /stats` should return:
 ```json
 {
-  "totalCompanies": 150,
-  "byAssetClass": { "Private Equity": 80, "Infrastructure": 40, ... },
-  "byIndustry": { "Technology": 30, "Healthcare": 25, ... },
-  "byRegion": { "North America": 90, "Europe": 40, ... }
+  "totalCompanies": 296,
+  "byAssetClass": { "Private Equity": 148, "Infrastructure": 67, "Tech Growth": 55, ... },
+  "byIndustry": { "Financials": 17, "Consumer Discretionary": 30, ... },
+  "byRegion": { "Americas": 123, "Asia Pacific": 93, "Europe, The Middle East And Africa": 79, "Japan": 1 }
 }
 ```
 
@@ -642,49 +723,85 @@ git commit -m "feat: add REST API with Swagger, filters, pagination, stats"
 
 ---
 
-## 🟢 PHASE 6 — Enrichment (Advanced: More Data)
+## 🟢 PHASE 6 — Normalization & Derived Fields (Advanced)
 
-**Goal**: Fetch additional company details if available.
+**Goal**: Improve data quality with computed fields — no extra scraping needed.
 
 > ⚠️ **Only do this if Phase 4-5 are solid**
 
-### 6.1 Check for Detail Data
+### 6.1 Key Finding: No Detail Fetch Required
 
 From Phase 0 recon:
-- [ ] Is there a company detail endpoint?
-- [ ] Does it have extra fields (description, website, etc.)?
+- ✅ **All fields are available in the list API response** (description, website, hq, yoi, logo)
+- ✅ Opening a company modal in the UI triggers **no additional XHR** — it uses cached list data
+- ⚠️ `relatedLinkOne`/`relatedLinkTwo` exist on some companies but are optional bonus content
 
-### 6.2 Implement Detail Fetcher
+### 6.2 Normalization Tasks
 
-```bash
-npm install p-limit  # concurrency control
+These should be done in the Response Mapper (Phase 4.2) during ingestion:
+
+- [ ] **Asset Classes**: Split `assetClassRaw` by comma into `assetClasses[]`
+  ```typescript
+  assetClasses: raw.assetClass.split(',').map(s => s.trim())
+  // "Global Impact, Private Equity" → ["Global Impact", "Private Equity"]
+  ```
+
+- [ ] **Description**: Strip HTML for text version
+  ```typescript
+  descriptionText: raw.description?.replace(/<[^>]*>/g, '').trim()
+  // "<p>Digital insurance brokerage</p>\n" → "Digital insurance brokerage"
+  ```
+
+- [ ] **Website**: Normalize URL scheme
+  ```typescript
+  website: raw.url ? (raw.url.startsWith('http') ? raw.url : `https://${raw.url}`) : undefined
+  // "www.example.com" → "https://www.example.com"
+  ```
+
+- [ ] **Logo**: Construct full URL
+  ```typescript
+  logoUrl: raw.logo ? `https://www.kkr.com${raw.logo}` : undefined
+  ```
+
+- [ ] **Sort Name**: Compute for indexing
+  ```typescript
+  nameSort: raw.name.toLowerCase()
+  ```
+
+- [ ] **Region Edge Case** (optional): Normalize `"Japan"` → `"Asia Pacific"` if you want only 3 canonical buckets
+
+### 6.3 Related Links (Optional Bonus)
+
+If `relatedLinkOne` or `relatedLinkTwo` are present:
+
+```typescript
+relatedLinks: {
+  linkOne: raw.relatedLinkOne ? {
+    url: raw.relatedLinkOne,  // Usually relative, prefix with base URL
+    title: raw.relatedLinkOneTitle || 'Related'
+  } : undefined,
+  linkTwo: raw.relatedLinkTwo ? {
+    urlOrId: raw.relatedLinkTwo,  // Can be URL OR Brightcove video ID!
+    title: raw.relatedLinkTwoTitle || 'Related'
+  } : undefined
+}
 ```
 
-- [ ] `fetchCompanyDetail(companyId): DetailDto`
-- [ ] Limit concurrent requests (5-10 max)
-- [ ] Graceful failure (don't break if one fails)
-
-### 6.3 Enrichment Command
-
-```bash
-npm run ingest -- --enrich
-# OR
-npm run enrich
-```
-
-- [ ] Runs after basic ingestion
-- [ ] Updates existing company documents
+> ⚠️ `relatedLinkTwo` can be a numeric video ID (e.g., Brightcove), not always a URL. Treat as string.
 
 ### 6.4 Commit
 
 ```bash
 git add .
-git commit -m "feat: add company detail enrichment"
+git commit -m "feat: add data normalization and computed fields"
 ```
 
 ### Deliverables
-- [ ] Additional fields populated where available
-- [ ] Enrichment failures don't break the run
+- [ ] `assetClasses[]` array correctly split from raw value
+- [ ] `descriptionText` is HTML-stripped
+- [ ] `website` and `logoUrl` are properly normalized
+- [ ] `nameSort` enables fast alphabetical sorting
+- [ ] All normalization happens during ingestion (no separate enrichment step)
 
 ---
 
@@ -896,13 +1013,13 @@ npm install helmet @nestjs/throttler
 
 | Order | Phase | Priority | Notes |
 |-------|-------|----------|-------|
-| 1 | Phase 0: Source Recon | 🔴 Critical | Do this FIRST — determines everything |
+| 1 | Phase 0: Source Recon | ✅ Complete | See `docs/source-analysis.md` |
 | 2 | Phase 1: Repo Setup | 🟡 High | NestJS scaffold + lint |
 | 3 | Phase 2: Config + DB | 🟡 High | Fail-fast config, MongoDB connection |
-| 4 | Phase 3: Data Model | 🟡 High | Schema + unique key strategy |
+| 4 | Phase 3: Data Model | 🟡 High | Schema + deterministic hash key |
 | 5 | Phase 4: Ingestion | 🟢 Core | The main deliverable |
 | 6 | Phase 5: REST API | 🟢 Core | Query + Swagger UI |
-| 7 | Phase 6: Enrichment | 🟢 Advanced | Only if 4-5 are solid |
+| 7 | Phase 6: Normalization | 🟢 Advanced | Computed fields (no extra scraping) |
 | 8 | Phase 7: Polish | 🔵 Important | Docker, tests, CI, docs |
 | 9 | Phase 8: Bonus | ⚪ Optional | Only if everything else is 100% |
 
@@ -914,7 +1031,7 @@ npm install helmet @nestjs/throttler
 
 1. **Commit often** with meaningful messages
 2. **Test incrementally** — verify each phase works before moving on
-3. **Don't skip Phase 0** — it determines your entire approach
+3. **Phase 0 is done** — reference `docs/source-analysis.md` for all API details
 4. **Prioritize working software** over bonus features
 5. **Document as you go** — don't leave README for last
 6. **Use `npx`** over global installs for reproducibility
@@ -922,5 +1039,6 @@ npm install helmet @nestjs/throttler
 8. **Two ways to run** — document both local and Docker approaches
 9. **Security matters** — never accept raw filters, always allowlist
 10. **AI is optional** — only add if you fully understand the code
+11. **Never store `sortingName`** — it changes based on sort parameter; use your own `nameSort`
 
 Good luck! 🚀
