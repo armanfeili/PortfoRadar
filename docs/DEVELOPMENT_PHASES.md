@@ -156,80 +156,58 @@ interface PortfolioCompany {
 
 ---
 
-## 🟡 PHASE 1 — Repository & Engineering Baseline
+## ✅ PHASE 1 — Repository & Engineering Baseline (COMPLETE)
 
 **Goal**: Professional repo structure that's easy to run and review.
 
-> ⚠️ **Important**: We scaffold with NestJS first to avoid conflicts, then customize.
+**Status**: ✅ **COMPLETE** — NestJS scaffolded, linting works, dev server runs.
 
-### 1.1 Initialize Repository
+### What Was Done
 
-```bash
-cd /Users/armanfeili/code/New\ Projects/PortfoRadar
-git init
-```
+1. **Moved existing files temporarily** before scaffolding (docs/, HAR files, etc.)
+2. **Switched to Node.js 20 LTS** (`nvm use 20`)
+3. **Scaffolded NestJS** with `npx @nestjs/cli new . --package-manager npm --skip-git`
+4. **Restored original files** and reorganized:
+   - `docs/` — Development phases, source analysis, challenge requirements
+   - `docs/research/` — HAR captures (git-ignored, ~10MB)
+5. **Created essential config files**:
+   - `.gitignore` — Comprehensive exclusions including `*.har`, `docs/research/`
+   - `.editorconfig` — Consistent formatting (2-space indent, LF, UTF-8)
+   - `.env.example` — Template with `PORT` and `MONGO_URI`
+   - `.nvmrc` — Pins Node.js 20
+6. **Updated `package.json`**:
+   - Added `"dev"` script alias for `nest start --watch`
+   - Set proper `name`, `description`, `author`, `license` (MIT)
+7. **Fixed ESLint warning** in `src/main.ts` (floating promise → `void bootstrap()`)
+8. **Replaced README.md** with project-specific documentation
 
-### 1.2 Scaffold NestJS Project
+### Files Created/Modified
 
-Use `npx` (not global install) for reproducibility:
+| File | Status | Description |
+|------|--------|-------------|
+| `.gitignore` | Created | Excludes `node_modules/`, `dist/`, `.env`, `*.har`, `docs/research/` |
+| `.editorconfig` | Created | 2-space indent, LF line endings, UTF-8 |
+| `.env.example` | Created | `PORT=3000`, `MONGO_URI=mongodb://localhost:27017/portfolioradar` |
+| `.nvmrc` | Created | Pins Node.js version to `20` |
+| `README.md` | Replaced | Project overview, quick start, available scripts |
+| `package.json` | Modified | Added `dev` script, description, author, MIT license |
+| `src/main.ts` | Modified | Fixed floating promise lint warning |
+| `docs/research/` | Created | Moved HAR files here (git-ignored) |
 
-> ⚠️ **Prerequisite**: Folder should be **empty except `.git/`** before running this command. If you have existing files (like docs/), either:
-> - Move them temporarily, scaffold, then restore
-> - Or scaffold into a subfolder: `npx @nestjs/cli new portforadar --package-manager npm`
+### Verification Results
 
-```bash
-# This creates the full NestJS structure with TypeScript, ESLint, Prettier
-npx @nestjs/cli new . --package-manager npm --skip-git
-```
-
-> **Note**: Keep default CJS (CommonJS) — don't add `"type": "module"`. NestJS ecosystem works smoother with CJS.
-
-### 1.3 Create Additional Essential Files
-
-Nest creates `.gitignore`, `.eslintrc.js`, `.prettierrc` — verify and enhance:
-
-- [ ] Verify `.gitignore` includes: `node_modules/`, `dist/`, `.env`, `*.log`
-- [ ] Create `.editorconfig`:
-  ```ini
-  root = true
-  [*]
-  indent_style = space
-  indent_size = 2
-  end_of_line = lf
-  charset = utf-8
-  trim_trailing_whitespace = true
-  insert_final_newline = true
-  ```
-- [ ] Create `.env.example` (template, no secrets):
-  ```bash
-  PORT=3000
-  MONGO_URI=mongodb://localhost:27017/portfolioradar
-  ```
-- [ ] Update `LICENSE` if needed
-- [ ] Update `README.md` with placeholder sections
-
-### 1.4 Verify Linting & Formatting
-
-Nest already includes ESLint + Prettier. Verify they work:
-
-```bash
-npm run lint
-npm run format
-```
-
-If you want stricter rules, customize `.eslintrc.js` later.
-
-### 1.5 First Commit
-
-```bash
-git add .
-git commit -m "chore: scaffold NestJS project with TypeScript, ESLint, Prettier"
-```
+| Check | Command | Result |
+|-------|---------|--------|
+| Lint passes | `npm run lint` | ✅ No errors |
+| Format works | `npm run format` | ✅ Success |
+| Dev server starts | `npm run start:dev` | ✅ "Nest application successfully started" |
+| Endpoint responds | `curl localhost:3000` | ✅ Returns "Hello World!" |
 
 ### Deliverables
-- [ ] `npm run lint` works without errors
-- [ ] `npm run start:dev` starts the default Nest app
-- [ ] Project structure matches NestJS conventions
+- [x] `npm run lint` works without errors
+- [x] `npm run start:dev` starts the default Nest app
+- [x] Project structure matches NestJS conventions
+- [x] Root directory is clean (research files in `docs/research/`)
 
 ---
 
