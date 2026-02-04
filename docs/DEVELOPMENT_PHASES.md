@@ -211,67 +211,69 @@ interface PortfolioCompany {
 
 ---
 
-## 🟡 PHASE 2 — Config Validation + Database + Logging
+## ✅ PHASE 2 — Config Validation + Database + Logging (COMPLETE)
 
 **Goal**: Running NestJS app connected to MongoDB with validated config and structured logging.
 
-> NestJS is already scaffolded from Phase 1. Now we add production-ready config.
+**Status**: ✅ **COMPLETE** — Config validation, MongoDB connection, Pino logging, and health endpoint all working.
 
-### 2.1 Configuration Module
+### What Was Done
 
-```bash
-npm install @nestjs/config zod
-```
+1. **Installed Phase 2 dependencies**:
+   - `@nestjs/config` + `zod` for env validation
+   - `@nestjs/mongoose` + `mongoose` for MongoDB
+   - `nestjs-pino` + `pino-http` + `pino-pretty` for structured logging
 
-- [ ] Create `src/config/env.validation.ts` using Zod
-- [ ] Validate required env vars: `MONGO_URI`, `PORT`
-- [ ] App should **fail fast** if env vars are missing
+2. **Created configuration validation** (`src/config/env.validation.ts`):
+   - Zod schema validates `PORT` (number, defaults to 3000) and `MONGO_URI` (required URL)
+   - App fails fast with clear error message if validation fails
 
-### 2.3 Database Module
+3. **Created database module** (`src/database/database.module.ts`):
+   - Connects to MongoDB using `MONGO_URI` from validated config
+   - Uses `MongooseModule.forRootAsync()` for async config injection
 
-```bash
-npm install @nestjs/mongoose mongoose
-```
+4. **Created health module** (`src/health/`):
+   - `HealthController` exposes `GET /health` → `{ status: "ok" }`
+   - `HealthModule` registers the controller
 
-- [ ] Create `src/database/database.module.ts`
-- [ ] Connect using `MONGO_URI` from config
-- [ ] Test connection on startup
+5. **Updated app.module.ts**:
+   - Integrated `ConfigModule.forRoot()` with Zod validation
+   - Added `LoggerModule.forRoot()` with pino-pretty for dev, JSON for prod
+   - Imported `DatabaseModule` and `HealthModule`
 
-### 2.4 Logging
+6. **Updated main.ts**:
+   - Uses `bufferLogs: true` for proper log ordering
+   - Applies pino logger to all NestJS logs
+   - Reads PORT from validated ConfigService
 
-```bash
-npm install nestjs-pino pino-http pino-pretty
-```
+7. **Created local .env** from .env.example (git-ignored)
 
-- [ ] Configure structured logging
-- [ ] Log HTTP requests
+### Files Created/Modified
 
-### 2.5 Health Endpoint
+| File | Status | Description |
+|------|--------|-------------|
+| `src/config/env.validation.ts` | Created | Zod schema + validateEnv function |
+| `src/database/database.module.ts` | Created | Mongoose connection module |
+| `src/health/health.controller.ts` | Created | Health check endpoint |
+| `src/health/health.module.ts` | Created | Health module |
+| `src/app.module.ts` | Modified | Integrated Config, Logger, Database, Health modules |
+| `src/main.ts` | Modified | Added pino logger + ConfigService for PORT |
+| `.env` | Created | Local environment variables (git-ignored) |
 
-- [ ] Create `GET /health` that returns `{ status: 'ok' }`
+### Verification Results
 
-### 2.6 NPM Scripts
-
-```json
-"scripts": {
-  "dev": "nest start --watch",
-  "build": "nest build",
-  "start": "node dist/main",
-  "start:prod": "node dist/main"
-}
-```
-
-### 2.7 Commit
-
-```bash
-git add .
-git commit -m "feat: add NestJS skeleton with config, MongoDB, logging"
-```
+| Check | Command | Result |
+|-------|---------|--------|
+| Lint passes | `npm run lint` | ✅ No errors |
+| Dev server starts | `npm run dev` | ✅ Starts with structured pino logs |
+| Health endpoint | `curl localhost:3000/health` | ✅ Returns `{"status":"ok"}` |
+| HTTP request logging | (any request) | ✅ Pino logs request/response with timing |
+| Missing MONGO_URI fails | `MONGO_URI= node dist/main.js` | ✅ Crashes with clear ZodError |
 
 ### Deliverables
-- [ ] `npm run dev` starts server successfully
-- [ ] `GET http://localhost:3000/health` returns OK
-- [ ] App crashes with clear error if `MONGO_URI` is missing
+- [x] `npm run dev` starts server successfully
+- [x] `GET http://localhost:3000/health` returns OK
+- [x] App crashes with clear error if `MONGO_URI` is missing
 
 ---
 
