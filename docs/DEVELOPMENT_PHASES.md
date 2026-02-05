@@ -277,144 +277,79 @@ interface PortfolioCompany {
 
 ---
 
-## 🟡 PHASE 3 — Data Model (Schemas + Repositories)
+## ✅ PHASE 3 — Data Model (Schemas + Repositories) (COMPLETE)
 
 **Goal**: Well-structured MongoDB schema with idempotent upsert capability.
 
-### 3.1 Company Schema
+**Status**: ✅ **COMPLETE** — Company and IngestionRun schemas created, repository with idempotent upsert verified.
 
-Create `src/companies/schemas/company.schema.ts`:
+### What Was Done
 
-```typescript
-// Required fields (from KKR API — verified in source-analysis.md)
-- companyId: string        // unique, indexed — deterministic hash (see below)
-- name: string
-- nameSort: string         // Computed: name.toLowerCase() for fast sorting
-- assetClassRaw: string    // Raw from API (may be comma-separated, e.g., "Global Impact, Private Equity")
-- assetClasses: string[]   // Computed: split by comma, trimmed — indexed (multikey)
-- industry: string         // indexed  
-- region: string           // indexed — single string from API (e.g., "Americas")
+1. **Created Company Schema** (`src/companies/schemas/company.schema.ts`):
+   - Required fields: `companyId` (unique), `name`, `nameSort`, `assetClassRaw`, `assetClasses[]`, `industry`, `region`
+   - Optional fields: `descriptionHtml`, `descriptionText`, `website`, `headquarters`, `yearOfInvestment`, `logoPath`, `logoUrl`, `relatedLinks`
+   - Source metadata: `source.listUrl`, `source.endpoint`, `source.fetchedAt`
+   - Indexes: `companyId` (unique), `nameSort`, `assetClasses` (multikey), `industry`, `region`, compound `industry+region`
 
-// Additional fields from API (all available in list endpoint!)
-- descriptionHtml?: string  // Raw HTML from API (e.g., "<p>Digital insurance...</p>")
-- descriptionText?: string  // Computed: HTML-stripped for search/display
-- website?: string          // From `url` field — normalized (add https:// if missing)
-- headquarters?: string     // From `hq` field
-- yearOfInvestment?: string // From `yoi` field
-- logoPath?: string         // Raw from API (relative path)
-- logoUrl?: string          // Computed: "https://www.kkr.com" + logoPath
+2. **Created IngestionRun Schema** (`src/ingestion/schemas/ingestion-run.schema.ts`):
+   - Fields: `runId`, `startedAt`, `finishedAt`, `status`, `counts`, `errorMessages` (renamed from `errors` to avoid Mongoose reserved path)
+   - Source metadata: `listUrl`, `endpointUsed`, `totalFromSource`, `pagesFromSource`, `asOf`, `scopeNote`
+   - Indexes: `startedAt` (descending), compound `status+startedAt`
 
-// Optional related links (present on some companies)
-- relatedLinks?: {
-    linkOne?: { url: string; title: string };      // Usually press releases
-    linkTwo?: { urlOrId: string; title: string };  // Can be URL OR video ID (treat as string)
-  }
+3. **Created Companies Repository** (`src/companies/companies.repository.ts`):
+   - `upsertCompany(dto)` — idempotent insert/update by `companyId`
+   - `bulkUpsert(dtos)` — batch upsert with bulkWrite
+   - `findAll(filters, pagination)` — paginated query with filters for assetClass, industry, region, search
+   - `findByCompanyId(id)` — single document lookup
+   - `countByField(field)` — aggregation for stats
+   - `countAll()` — total document count
+   - `deleteAll()` — for testing
 
-// Source metadata (production-ready provenance)
-- source: {
-    listUrl: string       // "https://www.kkr.com/invest/portfolio"
-    endpoint: string      // Full API endpoint URL
-    fetchedAt: Date       // when this record was last fetched
-  }
+4. **Created Modules**:
+   - `CompaniesModule` — registers Company schema, exports CompaniesRepository
+   - `IngestionModule` — registers IngestionRun schema
 
-// Timestamps (Mongoose handles these)
-- createdAt: Date
-- updatedAt: Date
+5. **Updated AppModule** with new module imports
+
+6. **Created Test Script** (`src/scripts/test-upsert.ts`):
+   - Verifies upsert idempotency (run twice = no duplicates)
+   - Verifies updates apply correctly
+
+### Files Created/Modified
+
+| File | Status | Description |
+|------|--------|-------------|
+| `src/companies/schemas/company.schema.ts` | Created | Company Mongoose schema with indexes |
+| `src/companies/companies.repository.ts` | Created | Data access layer with upsert |
+| `src/companies/companies.module.ts` | Created | Companies NestJS module |
+| `src/ingestion/schemas/ingestion-run.schema.ts` | Created | IngestionRun schema for tracking |
+| `src/ingestion/ingestion.module.ts` | Created | Ingestion NestJS module |
+| `src/app.module.ts` | Modified | Added CompaniesModule, IngestionModule imports |
+| `src/scripts/test-upsert.ts` | Created | Upsert idempotency verification script |
+
+### Verification Results
+
+| Check | Command | Result |
+|-------|---------|--------|
+| Lint passes | `npm run lint` | ✅ No errors |
+| Build passes | `npm run build` | ✅ No errors |
+| Server starts | `npm run start:dev` | ✅ All modules load correctly |
+| Health endpoint | `curl localhost:3000/health` | ✅ `{"status":"ok"}` |
+| Upsert test | `npx ts-node src/scripts/test-upsert.ts` | ✅ PASS: no duplicates |
+
+### Upsert Idempotency Test Results
+
 ```
-
-> ⚠️ **Do NOT store API's `sortingName` field!** It changes based on `sortParameter` used in the request. Use your own computed `nameSort` instead.
-
-#### Unique Key Strategy (Critical!)
-
-**The KKR API does NOT provide a unique ID.** Use a deterministic hash:
-
-```typescript
-import { createHash } from 'crypto';
-
-function generateCompanyId(company: PortfolioCompany): string {
-  // Combine stable fields to create collision-resistant key
-  // Use raw assetClass (before splitting) for consistency
-  const normalized = [
-    company.name.toLowerCase().trim(),
-    company.yoi,
-    company.hq.toLowerCase().trim(),
-    company.assetClass.toLowerCase().trim(),  // assetClassRaw
-    company.industry.toLowerCase().trim()
-  ].join('|');
-  
-  return createHash('sha256').update(normalized).digest('hex').substring(0, 32);
-}
-```
-
-> ⚠️ **Never use name alone** — names can change or have duplicates.
-> 
-> ⚠️ **Limitation**: If KKR changes a company's name or other fields, the hash will change.
->
-> 💡 **Tip**: You can also generate a human-readable `slug` (e.g., `"plus-simple"` from `"+Simple"`) for display URLs, but use `companyId` hash as the primary key.
-
-#### Region Data Note
-
-The API returns `region` as a **single string** (not an array):
-- `"Americas"` (123 companies)
-- `"Asia Pacific"` (93 companies)
-- `"Europe, The Middle East And Africa"` (79 companies)
-- `"Japan"` (1 company — SmartHR only)
-
-Stats endpoint computes distribution by counting companies per region value.
-
-- [ ] Add unique index on `companyId`
-- [ ] Add multikey index on `assetClasses` (array field)
-- [ ] Add query indexes on `industry`, `region`
-- [ ] Add sort index on `nameSort` (optional, for fast alphabetical queries)
-
-### 3.2 Ingestion Run Schema (Recommended)
-
-Create `src/ingestion/schemas/ingestion-run.schema.ts`:
-
-```typescript
-- runId: string
-- startedAt: Date
-- finishedAt?: Date
-- status: 'running' | 'completed' | 'failed'
-- counts: {
-    fetched: number
-    created: number
-    updated: number
-    failed: number
-  }
-- errors: string[]  // sample errors, capped at ~10
-
-// Source metadata (proves you're careful about provenance)
-- sourceMeta: {
-    listUrl: string           // main portfolio URL
-    endpointUsed: string      // actual API endpoint
-    totalFromSource: number   // `hits` from API response (e.g., 296)
-    pagesFromSource: number   // `pages` from API response (e.g., 20)
-    asOf?: string             // "as of" date if visible
-    scopeNote?: string        // e.g., "Portfolio of KKR General Partner only"
-  }
-```
-
-### 3.3 Company Repository
-
-Create `src/companies/companies.repository.ts`:
-
-- [ ] `upsertCompany(dto)` — insert or update by `companyId`
-- [ ] `findAll(filters, pagination)`
-- [ ] `findByCompanyId(id)`
-- [ ] `countByField(field)` — for stats
-
-### 3.4 Commit
-
-```bash
-git add .
-git commit -m "feat: add Company and IngestionRun schemas with indexes"
+1. First upsert:  created=true,  updated=false → count=1
+2. Second upsert: created=false, updated=true  → count=1 (no duplicate)
+3. Third upsert:  created=false, updated=true  → count=1 (field updated)
+✅ PASS: Upsert is idempotent - no duplicates created
 ```
 
 ### Deliverables
-- [ ] Schemas defined with proper TypeScript types
-- [ ] Indexes visible in schema code
-- [ ] Upsert tested: same company doesn't duplicate
+- [x] Schemas defined with proper TypeScript types
+- [x] Indexes visible in schema code
+- [x] Upsert tested: same company doesn't duplicate
 
 ---
 

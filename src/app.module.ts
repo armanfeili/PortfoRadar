@@ -6,6 +6,8 @@ import { AppService } from './app.service';
 import { validateEnv } from './config/env.validation';
 import { DatabaseModule } from './database/database.module';
 import { HealthModule } from './health/health.module';
+import { CompaniesModule } from './companies/companies.module';
+import { IngestionModule } from './ingestion/ingestion.module';
 
 @Module({
   imports: [
@@ -24,6 +26,8 @@ import { HealthModule } from './health/health.module';
     }),
     DatabaseModule,
     HealthModule,
+    CompaniesModule,
+    IngestionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
