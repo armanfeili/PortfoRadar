@@ -165,7 +165,9 @@ export class CompaniesRepository {
 
     if (filters.search) {
       // Case-insensitive search on name
-      query.name = { $regex: filters.search, $options: 'i' };
+      // Escape regex special characters to prevent injection/ReDoS
+      const escaped = filters.search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      query.name = { $regex: escaped, $options: 'i' };
     }
 
     // Execute query with pagination

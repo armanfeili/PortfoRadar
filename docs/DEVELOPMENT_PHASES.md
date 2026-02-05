@@ -90,7 +90,7 @@ Before submitting, verify ALL of these with the provided commands:
 | Required fields stored | `npm run verify:data` | 0 companies missing name/assetClasses/industry/region |
 | Well-structured schema | Check `src/companies/schemas/` | Indexes defined, types explicit |
 | Idempotent ingestion | Run `npm run ingest` twice | Second run shows updates, not new inserts |
-| REST API works | `curl localhost:3000/companies` | Returns `{ items: [...], page, limit, total }` |
+| REST API works | `curl localhost:3000/companies` | Returns `{ items: [...], page, limit, total, totalPages }` |
 | Swagger UI | Open `http://localhost:3000/api/docs` | Interactive docs load |
 | Docker works | `docker compose up --build` | App + Mongo start, API responds |
 | README complete | Read `README.md` | Setup → Ingest → Query flow is clear |
