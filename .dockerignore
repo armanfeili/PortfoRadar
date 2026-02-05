@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Development files
+.git/
+.gitignore
+.env
+.env.local
+*.md
+docs/
+
+# IDE
+.vscode/
+.idea/
+
+# Test files
+coverage/
+test/
+
+# Misc
+*.log
+*.har
+.DS_Store
