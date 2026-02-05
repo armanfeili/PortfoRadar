@@ -353,9 +353,58 @@ interface PortfolioCompany {
 
 ---
 
-## 🟢 PHASE 4 — Ingestion Service (Core Feature)
+## ✅ PHASE 4 — Ingestion Service (Core Feature) (COMPLETE)
 
 **Goal**: Retrieve ALL companies from KKR and store in MongoDB.
+
+**Status**: ✅ **COMPLETE** — KKR HTTP client, company mapper, ingestion service, and verification script all working.
+
+### What Was Done
+
+1. **Installed Phase 4 dependencies**: `undici`, `p-retry`, `p-limit`
+2. **Created KKR HTTP Client** (`src/ingestion/kkr-client/kkr.client.ts`):
+   - Page-based pagination (1-indexed, 15 items/page fixed by API)
+   - 30s timeout, 3 retries with exponential backoff (1s → 2s → 4s)
+   - Concurrency limit of 3 concurrent requests
+   - Proper User-Agent and Accept headers
+3. **Created Company Mapper** (`src/ingestion/mappers/company.mapper.ts`):
+   - Deterministic `companyId` via SHA256 hash of name+yoi+hq+assetClass+industry
+   - Splits `assetClassRaw` into `assetClasses[]` array
+   - Strips HTML from description, normalizes URLs, builds full logo URLs
+4. **Created Ingestion Run Repository** (`src/ingestion/ingestion-run.repository.ts`):
+   - CRUD operations for IngestionRun documents
+   - Tracks `sourceMeta.totalFromSource` and `sourceMeta.pagesFromSource`
+5. **Created Portfolio Ingest Service** (`src/ingestion/portfolio-ingest.service.ts`):
+   - Fetches all pages, deduplicates in memory by companyId
+   - Bulk upserts to MongoDB, tracks created/updated/failed counts
+6. **Created Entry Scripts**:
+   - `src/ingest.ts` — Bootstrap script for `npm run ingest`
+   - `src/scripts/verify-data.ts` — Data quality verification
+7. **Updated IngestionModule** with new providers
+
+### Files Created/Modified
+
+| File | Status | Description |
+|------|--------|-------------|
+| `src/ingestion/kkr-client/kkr-api.types.ts` | Created | TypeScript interfaces for KKR API |
+| `src/ingestion/kkr-client/kkr.client.ts` | Created | HTTP client with retry/concurrency |
+| `src/ingestion/mappers/company.mapper.ts` | Created | Raw API → UpsertCompanyDto mapper |
+| `src/ingestion/ingestion-run.repository.ts` | Created | IngestionRun CRUD operations |
+| `src/ingestion/portfolio-ingest.service.ts` | Created | Main ingestion orchestration |
+| `src/ingestion/ingestion.module.ts` | Modified | Added providers |
+| `src/ingest.ts` | Created | Entry script for `npm run ingest` |
+| `src/scripts/verify-data.ts` | Created | Data quality verification |
+| `package.json` | Modified | Added `ingest` and `verify:data` scripts |
+
+### Verification Results
+
+| Check | Command | Result |
+|-------|---------|--------|
+| Lint passes | `npm run lint` | ✅ No errors |
+| Build passes | `npm run build` | ✅ No errors |
+| Ingestion works | `npm run ingest` | ✅ Fetched: 296, Source total: 296 |
+| Data quality | `npm run verify:data` | ✅ PASS (0 missing fields, 0 duplicates) |
+| Idempotent | Run `npm run ingest` twice | ✅ Second run shows updates, not new inserts |
 
 ### 4.1 KKR HTTP Client
 
@@ -373,32 +422,32 @@ Create `src/ingestion/kkr-client/kkr.client.ts`:
 npm install undici p-retry p-limit
 ```
 
-- [ ] Implement `fetchPortfolioPage(pageNumber: number)` — **page-based, NOT offset/limit**
+- [x] Implement `fetchPortfolioPage(pageNumber: number)` — **page-based, NOT offset/limit**
   ```typescript
   // API uses page-based pagination (1-indexed)
   // The `limit` parameter is IGNORED — always returns 15 items
   const url = `${BASE_ENDPOINT}?page=${pageNumber}&sortParameter=name&sortingOrder=asc`;
   ```
-- [ ] **Set proper headers**:
+- [x] **Set proper headers**:
   ```typescript
   headers: {
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
     'Accept': 'application/json',
   }
   ```
-- [ ] Add timeout (e.g., 30 seconds)
-- [ ] Add retry with exponential backoff (3 retries, 1s → 2s → 4s)
-- [ ] **Concurrency cap**: Max 3-5 concurrent requests (don't hammer the site)
-- [ ] Handle rate limiting gracefully (429 → back off)
+- [x] Add timeout (e.g., 30 seconds)
+- [x] Add retry with exponential backoff (3 retries, 1s → 2s → 4s)
+- [x] **Concurrency cap**: Max 3-5 concurrent requests (don't hammer the site)
+- [x] Handle rate limiting gracefully (429 → back off)
 
 ### 4.2 Response Mapper
 
 Create `src/ingestion/mappers/company.mapper.ts`:
 
-- [ ] `mapRawToCompany(rawItem): CompanyDto`
-- [ ] Handle missing fields gracefully
-- [ ] Generate `companyId` using deterministic hash
-- [ ] Compute derived fields:
+- [x] `mapRawToCompany(rawItem): CompanyDto`
+- [x] Handle missing fields gracefully
+- [x] Generate `companyId` using deterministic hash
+- [x] Compute derived fields:
   ```typescript
   // Split asset classes
   assetClassRaw: raw.assetClass,
@@ -434,9 +483,9 @@ Same company may appear across pages/filters. Handle with **two layers**:
 1. **In-memory Set** of `companyId` — skip if already processed this run
 2. **DB upsert + unique index** — guarantees no duplicates even if Set fails
 
-- [ ] **Critical**: Do NOT let one company failure crash entire run
-- [ ] Log progress: "Fetched page 1/20", "Upserted company X"
-- [ ] Log summary at end: "Ingestion complete: 296 fetched, 290 created, 6 updated, 0 failed"
+- [x] **Critical**: Do NOT let one company failure crash entire run
+- [x] Log progress: "Fetched page 1/20", "Upserted company X"
+- [x] Log summary at end: "Ingestion complete: 296 fetched, 290 created, 6 updated, 0 failed"
 
 ### 4.4 Ingestion Command
 
@@ -456,7 +505,7 @@ async function bootstrap() {
 }
 ```
 
-- [ ] Add npm script: `"ingest": "ts-node src/ingest.ts"`
+- [x] Add npm script: `"ingest": "ts-node src/ingest.ts"`
 
 ### 4.5 Test Ingestion
 
@@ -468,8 +517,8 @@ docker run -d -p 27017:27017 --name mongo mongo:7
 npm run ingest
 ```
 
-- [ ] Verify all companies are in database
-- [ ] Run again → verify no duplicates (idempotent)
+- [x] Verify all companies are in database
+- [x] Run again → verify no duplicates (idempotent)
 
 ### 4.6 Add Data Verification Script (First-Class Citizen)
 
@@ -528,24 +577,71 @@ git commit -m "feat: implement KKR portfolio ingestion with idempotent upsert"
 ```
 
 ### Deliverables
-- [ ] `npm run ingest` populates database
-- [ ] `npm run verify:data` shows all required fields present
-- [ ] Re-running doesn't create duplicates (check with `npm run ingest` twice)
+- [x] `npm run ingest` populates database
+- [x] `npm run verify:data` shows all required fields present
+- [x] Re-running doesn't create duplicates (check with `npm run ingest` twice)
 
 ---
 
-## 🟢 PHASE 5 — REST API (Query & Show Data)
+## ✅ PHASE 5 — REST API (Query & Show Data) (COMPLETE)
 
 **Goal**: Provide endpoints to query and display stored data.
+**Status**: ✅ **COMPLETE** — REST endpoints, Swagger UI, DTOs with validation, and secure query handling all working.
 
+### What Was Done
+
+1. **Installed Phase 5 dependencies**: `@nestjs/swagger`, `swagger-ui-express`, `class-validator`, `class-transformer`
+2. **Created DTOs** (`src/companies/dto/`):
+   - `query-companies.dto.ts` — Query params with validation (assetClass, industry, region, q, page, limit)
+   - `company-response.dto.ts` — Response DTOs with Swagger decorators
+   - `stats-response.dto.ts` — Stats response DTO
+3. **Created Companies Service** (`src/companies/companies.service.ts`):
+   - Wraps repository methods with DTO transformation
+4. **Created Controllers** (`src/companies/companies.controller.ts`):
+   - `GET /companies` — List with filters + pagination
+   - `GET /companies/:id` — Single company lookup with 404 handling
+   - `GET /stats` — Aggregated statistics
+5. **Updated main.ts**:
+   - Added Swagger configuration at `/api/docs`
+   - Added global ValidationPipe with `whitelist`, `forbidNonWhitelisted`, `transform`
+6. **Security**: Regex escaping for `q` search parameter to prevent injection/ReDoS
+
+### Files Created/Modified
+
+| File | Status | Description |
+|------|--------|-------------|
+| `src/companies/dto/query-companies.dto.ts` | Created | Query params DTO with validation |
+| `src/companies/dto/company-response.dto.ts` | Created | Response DTOs with Swagger decorators |
+| `src/companies/dto/stats-response.dto.ts` | Created | Stats response DTO |
+| `src/companies/dto/index.ts` | Created | Barrel export |
+| `src/companies/companies.service.ts` | Created | Service layer |
+| `src/companies/companies.controller.ts` | Created | REST endpoints |
+| `src/companies/companies.module.ts` | Modified | Added service + controllers |
+| `src/companies/companies.repository.ts` | Modified | Added regex escaping for search |
+| `src/main.ts` | Modified | Added Swagger + ValidationPipe |
+| `package.json` | Modified | Added swagger + validation dependencies |
+
+### Verification Results
+
+| Check | Command | Result |
+|-------|---------|--------|
+| Lint passes | `npm run lint` | ✅ No errors |
+| Build passes | `npm run build` | ✅ No errors |
+| List companies | `curl localhost:3000/companies?limit=2` | ✅ Returns `{ items, page, limit, total, totalPages }` |
+| Filter works | `curl localhost:3000/companies?assetClass=Infrastructure` | ✅ Returns 67 Infrastructure companies |
+| Stats endpoint | `curl localhost:3000/stats` | ✅ Returns totalCompanies, byAssetClass, byIndustry, byRegion |
+| Swagger UI | Open `http://localhost:3000/api/docs` | ✅ Interactive docs load |
+| Validation rejects unknown | `curl localhost:3000/companies?unknownParam=x` | ✅ 400: property should not exist |
+| Validation rejects limit > 100 | `curl localhost:3000/companies?limit=200` | ✅ 400: limit must not be greater than 100 |
+| Regex safety | `curl localhost:3000/companies?q=.*` | ✅ Returns 0 (escaped, not 296) |
 ### 5.1 Install Swagger
 
 ```bash
 npm install @nestjs/swagger swagger-ui-express
 ```
 
-- [ ] Configure in `main.ts`
-- [ ] Swagger UI at `/api/docs`
+- [x] Configure in `main.ts`
+- [x] Swagger UI at `/api/docs`
 
 ### 5.2 Companies Controller
 
@@ -579,9 +675,9 @@ npm install class-validator class-transformer
 ```
 
 Create `src/companies/dto/`:
-- [ ] `query-companies.dto.ts`
-- [ ] `company-response.dto.ts`
-- [ ] `stats-response.dto.ts`
+- [x] `query-companies.dto.ts`
+- [x] `company-response.dto.ts`
+- [x] `stats-response.dto.ts`
 
 Enable validation in `main.ts`:
 ```typescript
@@ -632,9 +728,9 @@ git commit -m "feat: add REST API with Swagger, filters, pagination, stats"
 ```
 
 ### Deliverables
-- [ ] Swagger UI accessible at `/api/docs`
-- [ ] Can filter companies by asset class, industry, region
-- [ ] Stats endpoint returns distribution counts
+- [x] Swagger UI accessible at `/api/docs`
+- [x] Can filter companies by asset class, industry, region
+- [x] Stats endpoint returns distribution counts
 
 ---
 
