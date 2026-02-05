@@ -41,7 +41,7 @@ git clone <repository-url> && cd PortfoRadar
 docker compose up --build
 
 # In another terminal, ingest data
-curl -X POST http://localhost:3000/ingestion/run
+docker compose exec app npm run ingest
 
 # Verify data
 curl http://localhost:3000/companies | jq '.meta.total'
@@ -68,10 +68,10 @@ docker run -d -p 27017:27017 --name mongo mongo:7
 npm run start:dev
 
 # Ingest data
-curl -X POST http://localhost:3000/ingestion/run
+npm run ingest
 
 # Open Swagger UI
-open http://localhost:3000/api
+open http://localhost:3000/api/docs
 ```
 
 ## Environment Variables
@@ -84,7 +84,7 @@ open http://localhost:3000/api
 
 ## API Documentation
 
-Interactive Swagger documentation available at `/api` when running.
+Interactive Swagger documentation available at `/api/docs` when running.
 
 ### Core Endpoints
 
@@ -94,7 +94,8 @@ Interactive Swagger documentation available at `/api` when running.
 | GET | `/companies/:id` | Get single company by ID |
 | GET | `/stats` | Aggregated statistics |
 | GET | `/health` | Health check |
-| POST | `/ingestion/run` | Trigger data ingestion |
+
+> **Note:** Data ingestion is performed via CLI (`npm run ingest`), not through an HTTP endpoint.
 
 ### Query Parameters for `/companies`
 
@@ -163,28 +164,41 @@ curl http://localhost:3000/companies/abc123def456...
 src/
 ├── app.module.ts                   # Root module
 ├── main.ts                         # Application bootstrap
+├── ingest.ts                       # CLI ingestion entrypoint
 ├── config/
-│   └── configuration.ts            # Environment config
+│   └── env.validation.ts           # Zod environment validation
 ├── companies/
 │   ├── companies.module.ts         # Companies feature module
-│   ├── companies.controller.ts     # REST endpoints
+│   ├── companies.controller.ts     # REST endpoints (companies + stats)
 │   ├── companies.service.ts        # Business logic
 │   ├── companies.repository.ts     # MongoDB operations
 │   ├── dto/                        # Data transfer objects
 │   └── schemas/
 │       └── company.schema.ts       # Mongoose schema
+├── database/
+│   └── database.module.ts          # MongoDB connection module
 ├── ingestion/
 │   ├── ingestion.module.ts         # Ingestion feature module
-│   ├── ingestion.service.ts        # Orchestration logic
+│   ├── portfolio-ingest.service.ts # Ingestion orchestration
+│   ├── ingestion-run.repository.ts # Run tracking repository
 │   ├── kkr-client/                 # KKR API client
-│   └── mappers/
-│       └── company.mapper.ts       # Raw → DTO transformation
-└── health/
-    └── health.module.ts            # Health checks
+│   │   ├── kkr.client.ts           # HTTP client with retry
+│   │   └── kkr-api.types.ts        # API type definitions
+│   ├── mappers/
+│   │   └── company.mapper.ts       # Raw → DTO transformation
+│   └── schemas/
+│       └── ingestion-run.schema.ts # Run tracking schema
+├── health/
+│   ├── health.module.ts            # Health module
+│   └── health.controller.ts        # Health check endpoint
+└── scripts/
+    ├── test-upsert.ts              # Upsert verification script
+    └── verify-data.ts              # Data quality verification
 
 docs/
 ├── DEVELOPMENT_PHASES.md           # Implementation roadmap
-└── source-analysis.md              # KKR API analysis
+├── source-analysis.md              # KKR API analysis
+└── Berry_Code_Challenge.txt        # Challenge requirements
 
 test/
 ├── app.e2e-spec.ts                 # E2E tests
@@ -233,7 +247,7 @@ The Docker setup includes:
 ## Design Decisions
 
 ### 1. Deterministic Company IDs
-Companies are assigned MD5 hashes derived from `name + hq + assetClass`, ensuring idempotent upserts during re-ingestion.
+Companies are assigned SHA256 hashes (32-char hex) derived from `name + yoi + hq + assetClass + industry`, ensuring idempotent upserts during re-ingestion.
 
 ### 2. Field Normalization
 - `assetClassRaw` preserved for display; `assetClasses[]` split for filtering
