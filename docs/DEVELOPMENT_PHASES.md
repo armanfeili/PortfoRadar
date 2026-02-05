@@ -734,11 +734,35 @@ git commit -m "feat: add REST API with Swagger, filters, pagination, stats"
 
 ---
 
-## 🟢 PHASE 6 — Normalization & Derived Fields (Advanced)
+## ✅ PHASE 6 — Normalization & Derived Fields (Advanced) (COMPLETE)
 
 **Goal**: Improve data quality with computed fields — no extra scraping needed.
 
-> ⚠️ **Only do this if Phase 4-5 are solid**
+**Status**: ✅ **COMPLETE** — All normalization was implemented in Phase 4 via `company.mapper.ts`. Verified all derived fields are correctly populated during ingestion.
+
+> **Note**: Phase 4 already implemented all normalization requirements. This phase verified correctness.
+
+### What Was Verified
+
+All normalization happens in `src/ingestion/mappers/company.mapper.ts` during ingestion:
+
+1. **`assetClasses[]`** via `splitAssetClasses()`: Splits comma-separated values, trims, filters empties
+2. **`descriptionText`** via `stripHtml()`: Removes HTML tags + entities, collapses whitespace
+3. **`website`** via `normalizeUrl()`: Adds `https://` if missing, handles empty values
+4. **`logoUrl`** via `buildLogoUrl()`: Prefixes `https://www.kkr.com` to relative path
+5. **`nameSort`**: Computed as `raw.name.toLowerCase()`
+6. **`relatedLinks`**: Optional bonus — safely maps `relatedLinkOne`/`relatedLinkTwo` treating values as opaque strings
+
+### Verification Results
+
+| Check | Sample Data | Result |
+|-------|-------------|--------|
+| `assetClasses[]` split | `"Global Impact, Private Equity"` → `['Global Impact', 'Private Equity']` | ✅ Array with 2 trimmed values |
+| `descriptionText` stripped | `"<p>Digital insurance brokerage platform</p>\n"` → `"Digital insurance brokerage platform"` | ✅ No HTML tags |
+| `website` normalized | `"www.example.com"` → `"https://www.example.com"` | ✅ Fully qualified |
+| `logoUrl` absolute | `/content/dam/kkr/.../logo.png` → `https://www.kkr.com/content/dam/kkr/.../logo.png` | ✅ Absolute URL |
+| `nameSort` lowercase | `"+Simple"` → `"+simple"` | ✅ Lowercase |
+| Data quality | `npm run verify:data` | ✅ PASS (296 companies, 0 missing fields) |
 
 ### 6.1 Key Finding: No Detail Fetch Required
 
@@ -751,35 +775,35 @@ From Phase 0 recon:
 
 These should be done in the Response Mapper (Phase 4.2) during ingestion:
 
-- [ ] **Asset Classes**: Split `assetClassRaw` by comma into `assetClasses[]`
+- [x] **Asset Classes**: Split `assetClassRaw` by comma into `assetClasses[]`
   ```typescript
   assetClasses: raw.assetClass.split(',').map(s => s.trim())
   // "Global Impact, Private Equity" → ["Global Impact", "Private Equity"]
   ```
 
-- [ ] **Description**: Strip HTML for text version
+- [x] **Description**: Strip HTML for text version
   ```typescript
   descriptionText: raw.description?.replace(/<[^>]*>/g, '').trim()
   // "<p>Digital insurance brokerage</p>\n" → "Digital insurance brokerage"
   ```
 
-- [ ] **Website**: Normalize URL scheme
+- [x] **Website**: Normalize URL scheme
   ```typescript
   website: raw.url ? (raw.url.startsWith('http') ? raw.url : `https://${raw.url}`) : undefined
   // "www.example.com" → "https://www.example.com"
   ```
 
-- [ ] **Logo**: Construct full URL
+- [x] **Logo**: Construct full URL
   ```typescript
   logoUrl: raw.logo ? `https://www.kkr.com${raw.logo}` : undefined
   ```
 
-- [ ] **Sort Name**: Compute for indexing
+- [x] **Sort Name**: Compute for indexing
   ```typescript
   nameSort: raw.name.toLowerCase()
   ```
 
-- [ ] **Region Edge Case** (optional): Normalize `"Japan"` → `"Asia Pacific"` if you want only 3 canonical buckets
+- [x] **Region Edge Case**: Kept as-is (Americas, Asia Pacific, Europe/Middle East/Africa, Japan) — no silent canonicalization
 
 ### 6.3 Related Links (Optional Bonus)
 
@@ -808,11 +832,11 @@ git commit -m "feat: add data normalization and computed fields"
 ```
 
 ### Deliverables
-- [ ] `assetClasses[]` array correctly split from raw value
-- [ ] `descriptionText` is HTML-stripped
-- [ ] `website` and `logoUrl` are properly normalized
-- [ ] `nameSort` enables fast alphabetical sorting
-- [ ] All normalization happens during ingestion (no separate enrichment step)
+- [x] `assetClasses[]` array correctly split from raw value
+- [x] `descriptionText` is HTML-stripped
+- [x] `website` and `logoUrl` are properly normalized
+- [x] `nameSort` enables fast alphabetical sorting
+- [x] All normalization happens during ingestion (no separate enrichment step)
 
 ---
 
