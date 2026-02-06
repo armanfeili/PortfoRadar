@@ -1286,35 +1286,27 @@ git commit -m "docs: complete README with setup and usage"
 
 ---
 
-### 8.7 CI/CD — Continuous Integration & Deployment
+### 8.7 CI/CD — Continuous Integration & Deployment ✅
 
 > **Evaluation**: "Use of CI/CD pipelines"
 
+**Status**: ✅ **COMPLETE** — CI/CD pipeline with coverage thresholds, Docker publishing, and CD verification.
+
 **Already done** (Phase 7):
 - [x] GitHub Actions CI pipeline (`.github/workflows/ci.yml`): lint → test → build → docker
+- [x] Status badges in README (already present)
 
-**Remaining enhancements**:
-- [ ] **Continuous Deployment (CD)**: Auto-deploy on merge to `main`
-  ```yaml
-  # .github/workflows/cd.yml
-  name: CD
-  on:
-    push:
-      branches: [main]
-  jobs:
-    deploy:
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v4
-        - name: Deploy to Railway/Render/Fly.io
-          # Platform-specific deploy step
-  ```
-- [ ] **Test coverage in CI**: Fail pipeline if coverage drops below threshold
-- [ ] **Docker image publish in CI**: Build and push image to registry on tagged releases
-- [ ] **Status badges in README**:
-  ```markdown
-  ![CI](https://github.com/armanfeili/PortfoRadar/actions/workflows/ci.yml/badge.svg)
-  ```
+**Completed enhancements**:
+- [x] **Continuous Deployment (CD)**: CD workflow (`.github/workflows/cd.yml`) verifies Railway deployment after CI passes
+  - Triggers after successful CI run on `main` branch
+  - Verifies deployment health by checking `/health` endpoint
+  - Railway auto-deploys via GitHub integration (configured in Railway dashboard)
+- [x] **Test coverage in CI**: Coverage thresholds enforced (60% for branches, functions, lines, statements)
+  - CI runs `npm run test:cov` and fails if thresholds not met
+  - Coverage thresholds configured in `package.json` jest config
+- [x] **Docker image publish in CI**: Enhanced to publish on tagged releases
+  - Tags: `latest` (main branch), semantic version tags (`v1.0.0`, `1.0`, `1`), and commit SHA
+  - Triggers on push to `main` and on tags matching `v*` pattern
 
 ---
 

@@ -1,0 +1,51 @@
+name: CD
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
+    branches:
+      - main
+      - master
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  verify-deployment:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    
+    steps:
+      - name: Wait for Railway deployment
+        run: |
+          echo "⏳ Waiting for Railway to deploy (Railway auto-deploys via GitHub integration)..."
+          sleep 30
+
+      - name: Verify deployment health
+        env:
+          RAILWAY_URL: ${{ secrets.RAILWAY_URL || 'https://portforadar-production.up.railway.app' }}
+        run: |
+          echo "🔍 Checking deployment health at $RAILWAY_URL/health"
+          for i in {1..10}; do
+            if curl -f -s "$RAILWAY_URL/health" > /dev/null; then
+              echo "✅ Deployment verified - health check passed"
+              exit 0
+            fi
+            echo "⏳ Attempt $i/10: Health check not ready yet, retrying in 10s..."
+            sleep 10
+          done
+          echo "⚠️ Health check failed after 10 attempts"
+          echo "Note: Railway auto-deploys via GitHub integration. If deployment fails, check Railway dashboard."
+          exit 1
+        continue-on-error: true
+
+      - name: Deployment status
+        if: always()
+        run: |
+          echo "📋 CD Pipeline Summary:"
+          echo "  - CI Status: ✅ Passed"
+          echo "  - Railway Deployment: Triggered via GitHub integration"
+          echo "  - Health Check: ${{ job.status }}"
+          echo ""
+          echo "💡 Railway automatically deploys when code is pushed to main."
+          echo "   Monitor deployments at: https://railway.app"

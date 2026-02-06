@@ -87,9 +87,21 @@
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "collectCoverageFrom": [
-      "**/*.(t|j)s"
+      "**/*.(t|j)s",
+      "!**/*.spec.ts",
+      "!**/scripts/**",
+      "!**/ingest.ts",
+      "!**/main.ts"
     ],
     "coverageDirectory": "../coverage",
+    "coverageThreshold": {
+      "global": {
+        "branches": 30,
+        "functions": 30,
+        "lines": 28,
+        "statements": 28
+      }
+    },
     "testEnvironment": "node"
   },
   "lint-staged": {

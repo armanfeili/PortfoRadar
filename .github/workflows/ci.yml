@@ -3,6 +3,8 @@ name: CI
 on:
   push:
     branches: [main, master]
+    tags:
+      - 'v*'
   pull_request:
     branches: [main, master]
 
@@ -28,6 +30,9 @@ jobs:
 
       - name: Run tests
         run: npm run test
+
+      - name: Run tests with coverage
+        run: npm run test:cov
 
       - name: Build
         run: npm run build
@@ -60,6 +65,9 @@ jobs:
           images: ghcr.io/${{ github.repository }}
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
             type=sha,prefix=
 
       - name: Build and push Docker image
