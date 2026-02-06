@@ -789,7 +789,7 @@ The KKR sitemap (`https://www.kkr.com/sitemap.xml`) was analyzed to identify all
 
 ### Conclusion
 
-**For the directory dataset required by the Berry Code Challenge, this endpoint is sufficient and serves as the backend for the portfolio grid on `/invest/portfolio`.**
+**For the directory dataset required by the Code Challenge, this endpoint is sufficient and serves as the backend for the portfolio grid on `/invest/portfolio`.**
 
 All 296 portfolio companies (as of the capture date) are accessible through this single endpoint. Other KKR pages either:
 - Link to the same portfolio page

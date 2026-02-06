@@ -245,7 +245,7 @@ src/
 docs/
 ├── DEVELOPMENT_PHASES.md           # Implementation roadmap
 ├── source-analysis.md              # KKR API analysis
-└── Berry_Code_Challenge.txt        # Challenge requirements
+└── Code_Challenge.txt              # Challenge requirements
 
 test/
 ├── app.e2e-spec.ts                 # E2E tests

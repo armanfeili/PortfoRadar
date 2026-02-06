@@ -1122,7 +1122,7 @@ git commit -m "docs: complete README with setup and usage"
 
 > ⚠️ **Only if all above phases are 100% complete and polished**
 > 
-> These items map directly to the **Bonus Points** section of the Berry Code Challenge evaluation criteria.
+> These items map directly to the **Bonus Points** section of the Code Challenge evaluation criteria.
 
 ---
 
