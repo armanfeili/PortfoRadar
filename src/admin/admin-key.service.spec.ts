@@ -71,26 +71,29 @@ describe('AdminKeyService', () => {
     });
 
     it('should set expiresAt based on TTL', async () => {
-      const now = Date.now();
-      jest.spyOn(Date, 'now').mockReturnValue(now);
-
       const mockCreatedKey = {
         _id: 'test-key-id',
         tokenHash: 'hashed',
-        expiresAt: new Date(now + 60 * 60 * 1000),
+        expiresAt: new Date(),
       };
 
       mockAdminKeyModel.create.mockResolvedValue(mockCreatedKey);
 
+      const beforeCall = Date.now();
       await service.generateKey(60); // 60 minutes
+      const afterCall = Date.now();
 
       const createCall = mockAdminKeyModel.create.mock.calls[0][0] as {
         expiresAt: Date;
       };
-      const expectedExpiry = new Date(now + 60 * 60 * 1000);
-      expect(createCall.expiresAt.getTime()).toBe(expectedExpiry.getTime());
 
-      jest.restoreAllMocks();
+      // Verify expiresAt is ~60 minutes from now (within 1 second tolerance)
+      const expectedMin = beforeCall + 60 * 60 * 1000;
+      const expectedMax = afterCall + 60 * 60 * 1000;
+      expect(createCall.expiresAt.getTime()).toBeGreaterThanOrEqual(
+        expectedMin,
+      );
+      expect(createCall.expiresAt.getTime()).toBeLessThanOrEqual(expectedMax);
     });
   });
 
