@@ -1121,37 +1121,247 @@ git commit -m "docs: complete README with setup and usage"
 ## ⚪ PHASE 8 — Bonus Features (Optional)
 
 > ⚠️ **Only if all above phases are 100% complete and polished**
+> 
+> These items map directly to the **Bonus Points** section of the Berry Code Challenge evaluation criteria.
 
-### Security Hardening
+---
+
+### 8.1 UX — Effectiveness of Interaction
+
+> **Evaluation**: "Effectiveness of interaction (REST API, CLI, UI, DB Console)"
+
+**Already done** (Phases 5 & 7):
+- [x] REST API with filters, pagination, and search (`GET /companies`, `GET /companies/:id`, `GET /stats`)
+- [x] Swagger UI at `/api/docs` for interactive API exploration
+- [x] Docker Compose for one-command setup
+
+**Remaining enhancements**:
+- [ ] **CLI commands** for common operations (e.g., `npm run ingest`, `npm run verify:data` — already exist, document clearly)
+- [ ] **API response improvements**: Add HATEOAS-style links, consistent error response format
+- [ ] **DB Console queries**: Document useful `mongosh` one-liners in README for reviewers who prefer DB-level inspection
+
+---
+
+### 8.2 Linter — Code Quality Tooling
+
+> **Evaluation**: "Use of linter to improve code quality"
+
+**Already done** (Phase 1):
+- [x] ESLint configured via `eslint.config.mjs`
+- [x] Prettier for code formatting
+- [x] `npm run lint` and `npm run format` scripts
+- [x] CI pipeline runs lint check on every push
+
+**Remaining enhancements**:
+- [ ] Add stricter ESLint rules (e.g., `no-floating-promises`, `no-unused-vars` as error)
+- [ ] Add `lint-staged` + `husky` for pre-commit hooks (auto-lint on commit)
+  ```bash
+  npm install -D husky lint-staged
+  npx husky init
+  ```
+
+---
+
+### 8.3 Container — Dockerization & Registry
+
+> **Evaluation**: "App is containerized (Docker), image is pushed to container registry"
+
+**Already done** (Phase 7):
+- [x] Multi-stage `Dockerfile` (Node 20 Alpine, non-root user)
+- [x] `docker-compose.yml` with App + MongoDB services
+- [x] `.dockerignore` for build exclusions
+- [x] `docker compose up --build` works end-to-end
+
+**Remaining enhancements**:
+- [ ] **Push image to container registry** (Docker Hub or GitHub Container Registry):
+  ```bash
+  # Tag and push to Docker Hub
+  docker build -t <username>/portfolioradar:latest .
+  docker push <username>/portfolioradar:latest
+  
+  # Or GitHub Container Registry
+  docker build -t ghcr.io/<username>/portfolioradar:latest .
+  docker push ghcr.io/<username>/portfolioradar:latest
+  ```
+- [ ] **Add Docker image build to CI pipeline** (`.github/workflows/ci.yml`):
+  ```yaml
+  - name: Build and push Docker image
+    uses: docker/build-push-action@v5
+    with:
+      push: true
+      tags: ghcr.io/${{ github.repository }}:latest
+  ```
+- [ ] Add health check in `docker-compose.yml` for app service (using `/health` endpoint)
+
+---
+
+### 8.4 Configuration Management — Env Vars & Secrets
+
+> **Evaluation**: "Use of environment variables vs hardcoded variables; Secrets management"
+
+**Already done** (Phase 2):
+- [x] `@nestjs/config` with Zod validation (`src/config/env.validation.ts`)
+- [x] `.env.example` with documented variables
+- [x] `.env` git-ignored (never committed)
+- [x] App fails fast with clear error if required env vars are missing
+
+**Remaining enhancements**:
+- [ ] **Secrets management**: Document how to handle secrets in production:
+  - Use cloud provider secret managers (AWS Secrets Manager, GCP Secret Manager, etc.)
+  - Use Docker secrets or Kubernetes secrets for containerized deployments
+  - Never log sensitive values (mask `MONGO_URI` in logs)
+- [ ] **Environment-specific configs**: Support `NODE_ENV` to toggle behavior (e.g., `development` vs `production` logging level)
+- [ ] **Add optional env vars** for bonus features:
+  ```bash
+  # .env.example additions
+  NODE_ENV=development          # development | production
+  LOG_LEVEL=info                # debug | info | warn | error
+  RATE_LIMIT_TTL=60             # Rate limit window in seconds
+  RATE_LIMIT_MAX=100            # Max requests per window
+  ```
+
+---
+
+### 8.5 Deployment — Cloud Hosting
+
+> **Evaluation**: "App deployed online and works remotely"
+
+- [ ] **Deploy to a cloud platform** (pick one):
+
+  | Platform | Pros | Notes |
+  |----------|------|-------|
+  | **Railway** | Easy, free tier, supports Docker | Recommended for speed |
+  | **Render** | Free tier, auto-deploy from Git | Good alternative |
+  | **Fly.io** | Edge deployment, Docker-native | More config needed |
+  | **AWS ECS / GCP Cloud Run** | Production-grade | Overkill for demo |
+
+- [ ] **Use managed MongoDB** (e.g., MongoDB Atlas free tier) for the deployed instance
+- [ ] **Document the live URL** in README:
+  ```markdown
+  ## 🌐 Live Demo
+  - API: https://portfolioradar.example.com/companies
+  - Swagger: https://portfolioradar.example.com/api/docs
+  ```
+- [ ] Ensure ingestion can run against the deployed instance
+
+---
+
+### 8.6 Tests — Automated Testing & Coverage
+
+> **Evaluation**: "Automated tests, test effectiveness and coverage"
+
+**Already done** (Phase 7):
+- [x] 29 unit tests for `company.mapper.ts` (`company.mapper.spec.ts`)
+- [x] 1 app controller test (`app.controller.spec.ts`)
+- [x] CI runs `npm run test` on every push
+
+**Remaining enhancements**:
+- [ ] **Integration tests**: Test repository upsert behavior with in-memory MongoDB
+  ```bash
+  npm install -D mongodb-memory-server
+  ```
+- [ ] **E2E tests**: Test REST endpoints end-to-end (`test/app.e2e-spec.ts`)
+  ```bash
+  npm run test:e2e
+  ```
+- [ ] **Test coverage reporting**:
+  ```bash
+  npm run test -- --coverage
+  ```
+  - Add coverage thresholds to `jest` config (e.g., 80% lines)
+  - Add coverage badge to README
+- [ ] **Additional unit tests**:
+  - KKR client (mock HTTP responses)
+  - Companies service (mock repository)
+  - DTOs validation (edge cases)
+
+---
+
+### 8.7 CI/CD — Continuous Integration & Deployment
+
+> **Evaluation**: "Use of CI/CD pipelines"
+
+**Already done** (Phase 7):
+- [x] GitHub Actions CI pipeline (`.github/workflows/ci.yml`): lint → test → build → docker
+
+**Remaining enhancements**:
+- [ ] **Continuous Deployment (CD)**: Auto-deploy on merge to `main`
+  ```yaml
+  # .github/workflows/cd.yml
+  name: CD
+  on:
+    push:
+      branches: [main]
+  jobs:
+    deploy:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v4
+        - name: Deploy to Railway/Render/Fly.io
+          # Platform-specific deploy step
+  ```
+- [ ] **Test coverage in CI**: Fail pipeline if coverage drops below threshold
+- [ ] **Docker image publish in CI**: Build and push image to registry on tagged releases
+- [ ] **Status badges in README**:
+  ```markdown
+  ![CI](https://github.com/<user>/portfolioradar/actions/workflows/ci.yml/badge.svg)
+  ```
+
+---
+
+### 8.8 Security Hardening
+
 ```bash
 npm install helmet @nestjs/throttler
 ```
-- [ ] Rate limiting
-- [ ] CORS configuration
-- [ ] Input size limits
 
-### Deployment
-- [ ] Deploy to cloud (Railway, Render, Fly.io)
-- [ ] Push Docker image to registry
-
-### AI Integration (High Risk — Only If Core Is Perfect)
-
-> ⚠️ The brief warns: "Poor understanding of AI-generated code will negatively affect evaluation."
-
-**Safe approach (if you do this at all):**
-- [ ] LLM outputs a **strict Query Intent DTO**, NOT raw MongoDB queries
+- [ ] **Helmet** — Set secure HTTP headers:
   ```typescript
-  interface QueryIntent {
-    intent: 'list_companies' | 'get_company' | 'stats';
-    filters?: { assetClass?: string; industry?: string; region?: string; };
-    pagination?: { page: number; limit: number; };
-  }
+  import helmet from 'helmet';
+  app.use(helmet());
   ```
-- [ ] Backend maps intent → allowlisted Mongo query (you control the query building)
-- [ ] Feature-flagged (`ENABLE_NL_QUERY=true`) — disabled by default
-- [ ] Rate limited (`@nestjs/throttler`)
-- [ ] Document clearly: what it can/can't do, how it's secured
-- [ ] **You MUST understand and be able to explain every line**
+- [ ] **Rate limiting** — Prevent abuse with `@nestjs/throttler`:
+  ```typescript
+  ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }])
+  ```
+- [ ] **CORS configuration** — Restrict origins in production:
+  ```typescript
+  app.enableCors({ origin: process.env.ALLOWED_ORIGINS?.split(',') || '*' });
+  ```
+- [ ] **Input size limits** — Prevent oversized payloads:
+  ```typescript
+  app.use(json({ limit: '1mb' }));
+  ```
+
+---
+
+### 8.9 AI Integration
+
+> **Evaluation**: "Use of AI is encouraged. Poor understanding of AI-generated code/logic will negatively affect evaluation."
+
+- [ ] Document AI usage in README or a dedicated `docs/AI_USAGE.md`:
+  - Which tools were used (e.g., GitHub Copilot, ChatGPT)
+  - What was AI-assisted vs manually written
+  - Key decisions and trade-offs understood
+- [ ] **Critical**: Be prepared to explain every piece of code during presentation — AI-generated code you don't understand will hurt your score
+
+---
+
+### Phase 8 Checklist Summary
+
+| Bonus Category | Status | Priority |
+|----------------|--------|----------|
+| UX (REST API + Swagger) | ✅ Done (Phase 5) | — |
+| Linter (ESLint + Prettier) | ✅ Done (Phase 1) | — |
+| Container (Docker + Compose) | ✅ Done (Phase 7) | — |
+| Config Management (env vars) | ✅ Done (Phase 2) | — |
+| Push image to registry | ⬜ Not started | 🟡 Medium |
+| Cloud deployment | ⬜ Not started | 🟡 Medium |
+| Extended test coverage | ⬜ Not started | 🟡 Medium |
+| CD pipeline | ⬜ Not started | 🟢 Low |
+| Security hardening | ⬜ Not started | 🟢 Low |
+| Pre-commit hooks | ⬜ Not started | 🟢 Low |
+| AI usage documentation | ⬜ Not started | 🟢 Low |
 
 ---
 
@@ -1184,7 +1394,6 @@ npm install helmet @nestjs/throttler
 7. **Verify with commands** — `npm run verify:data`, `npm run lint`, etc.
 8. **Two ways to run** — document both local and Docker approaches
 9. **Security matters** — never accept raw filters, always allowlist
-10. **AI is optional** — only add if you fully understand the code
-11. **Never store `sortingName`** — it changes based on sort parameter; use your own `nameSort`
+10. **Never store `sortingName`** — it changes based on sort parameter; use your own `nameSort`
 
 Good luck! 🚀
