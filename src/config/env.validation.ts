@@ -13,6 +13,11 @@ export const envSchema = z.object({
       (v) => v.startsWith('mongodb://') || v.startsWith('mongodb+srv://'),
       'MONGO_URI must start with mongodb:// or mongodb+srv://',
     ),
+  NODE_ENV: z
+    .enum(['development', 'production', 'test'])
+    .default('development'),
+  THROTTLE_TTL: z.coerce.number().int().positive().default(60),
+  THROTTLE_LIMIT: z.coerce.number().int().positive().default(100),
 });
 
 export type EnvConfig = z.infer<typeof envSchema>;
