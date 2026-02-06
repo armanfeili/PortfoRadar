@@ -129,13 +129,13 @@ export class AdminController {
     description:
       'Fetches all portfolio companies from KKR API and upserts into database. ' +
       'This operation typically takes 15-60 seconds. ' +
-      'Requires X-Admin-Key header for authentication (master or temporary key).',
+      'Requires X-Admin-Key header with a valid temporary key.',
   })
   @ApiHeader({
     name: 'X-Admin-Key',
-    description: 'Admin API key (master key or temporary key)',
+    description: 'Temporary admin key generated via POST /admin/keys',
     required: true,
-    example: 'your-admin-key-or-ak_xxx',
+    example: 'ak_a1b2c3d4e5f6...',
   })
   @ApiResponse({
     status: 200,

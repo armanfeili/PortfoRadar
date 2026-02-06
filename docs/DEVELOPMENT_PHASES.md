@@ -1274,7 +1274,7 @@ git commit -m "docs: complete README with setup and usage"
 **Implemented in Phase 8.6**:
 - [x] **Temporary Admin Keys** with comprehensive tests:
   - `admin-key.service.spec.ts`: 9 tests for key generation, validation, expiry, revocation
-  - Guard updated to accept master OR temp keys
+  - Guard validates temporary keys
   - Schema with TTL index for auto-cleanup
 - [x] **Total test count**: 83 tests passing
 - [x] Lint + build verification
@@ -1313,7 +1313,7 @@ git commit -m "docs: complete README with setup and usage"
 - [ ] **Docker image publish in CI**: Build and push image to registry on tagged releases
 - [ ] **Status badges in README**:
   ```markdown
-  ![CI](https://github.com/<user>/portfolioradar/actions/workflows/ci.yml/badge.svg)
+  ![CI](https://github.com/armanfeili/PortfoRadar/actions/workflows/ci.yml/badge.svg)
   ```
 
 ---

@@ -135,7 +135,7 @@ Interactive Swagger documentation available at `/api/docs` when running.
 | GET | `/companies/:id` | Get single company by ID |
 | GET | `/stats` | Aggregated statistics |
 | GET | `/health` | Health check |
-| POST | `/admin/keys` | Generate temporary admin key (requires master key) |
+| POST | `/admin/keys` | Generate temporary admin key (public endpoint) |
 | DELETE | `/admin/keys/:keyId` | Revoke a temporary key |
 | POST | `/admin/ingest` | Trigger data ingestion (requires `X-Admin-Key` header) |
 
