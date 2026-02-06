@@ -1,6 +1,6 @@
 Actual content:
 
-The Berry Code Challenge
+The Code Challenge
 
 This is the Code challenge. Explain in understandable way about everything related to this challenge.
 
@@ -104,11 +104,11 @@ Bonus Points
   - Poor understanding of AI-generated code/logic will negatively affect evaluation
 
 Note:  
-Please do not share this file or its contents with anyone other than Berry employees.  
+Please do not share this file or its contents with anyone other than employees.  
 This document is intended solely to provide the candidate with the information needed to complete the challenge.
 
 
-The Berry Code Challenge
+The Code Challenge
 =======================
 
 1) What this challenge is
@@ -306,7 +306,7 @@ These are “nice-to-have” and can increase your score if done well:
 
 11) Confidentiality note (must respect)
 ---------------------------------------
-Do not share this file or its contents with anyone except Berry employees.
+Do not share this file or its contents with anyone except employees.
 This document is provided only to complete the challenge.
 
 End of document.
