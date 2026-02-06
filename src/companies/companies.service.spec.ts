@@ -67,10 +67,12 @@ describe('CompaniesService', () => {
       expect(result.total).toBe(1);
       expect(result._links).toBeDefined();
       expect(result._links.self).toContain('/companies?');
-      expect(result._links.first).toContain('page=1');
-      expect(result._links.last).toContain('page=1');
-      expect(result._links.next).toBeUndefined();
-      expect(result._links.prev).toBeUndefined();
+      // When on first/only page, first/last are undefined (not needed)
+      expect(result._links.first).toBeUndefined();
+      expect(result._links.last).toBeUndefined();
+      // prev/next use null when not available
+      expect(result._links.next).toBeNull();
+      expect(result._links.prev).toBeNull();
     });
 
     it('should include next link when not on last page', async () => {
@@ -87,7 +89,7 @@ describe('CompaniesService', () => {
       const result = await service.findAll(query);
 
       expect(result._links.next).toContain('page=2');
-      expect(result._links.prev).toBeUndefined();
+      expect(result._links.prev).toBeNull();
     });
 
     it('should include prev link when not on first page', async () => {

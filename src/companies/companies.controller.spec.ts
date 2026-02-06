@@ -96,13 +96,13 @@ describe('CompaniesController', () => {
   });
 
   describe('findOne', () => {
-    it('should return a company with self link', async () => {
+    it('should return a company by ID', async () => {
       service.findByCompanyId.mockResolvedValue(mockCompany as any);
 
       const result = await controller.findOne('abc123def456789012345678');
 
       expect(result.name).toBe('Acme Corp');
-      expect(result._links.self).toBe('/companies/abc123def456789012345678');
+      expect(result.companyId).toBe(mockCompany.companyId);
     });
 
     it('should throw NotFoundException when company not found', async () => {

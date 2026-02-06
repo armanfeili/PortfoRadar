@@ -1177,13 +1177,9 @@ git commit -m "docs: complete README with setup and usage"
 - [x] `npm run lint` and `npm run format` scripts
 - [x] CI pipeline runs lint check on every push
 
-**Remaining enhancements**:
-- [ ] Add stricter ESLint rules (e.g., `no-floating-promises`, `no-unused-vars` as error)
-- [ ] Add `lint-staged` + `husky` for pre-commit hooks (auto-lint on commit)
-  ```bash
-  npm install -D husky lint-staged
-  npx husky init
-  ```
+**Remaining enhancements** (Completed):
+- [x] Add stricter ESLint rules (`no-floating-promises`, `no-unused-vars`, `no-return-await` as error)
+- [x] Add `lint-staged` + `husky` for pre-commit hooks (auto-lint on commit)
 
 ---
 

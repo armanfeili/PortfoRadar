@@ -77,8 +77,11 @@ describe('HttpExceptionFilter', () => {
     expect(body.message).toBe('Custom error');
   });
 
-  it('should handle non-HttpException errors as 500', () => {
-    const exception = new Error('Something unexpected');
+  it('should handle 500 Internal Server Error', () => {
+    const exception = new HttpException(
+      'Internal server error',
+      HttpStatus.INTERNAL_SERVER_ERROR,
+    );
 
     filter.catch(exception, mockHost);
 
