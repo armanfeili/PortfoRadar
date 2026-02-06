@@ -1,7 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { request } from 'undici';
+import { request, Agent } from 'undici';
 import * as pRetry from 'p-retry';
-import * as pLimit from 'p-limit';
 import {
   KkrApiResponse,
   KkrPaginationMeta,
@@ -26,16 +25,22 @@ export const KKR_PORTFOLIO_URL = 'https://www.kkr.com/invest/portfolio';
 interface KkrClientConfig {
   /** Request timeout in milliseconds */
   timeoutMs: number;
-  /** Maximum retry attempts */
+  /** Maximum retry attempts per page */
   maxRetries: number;
-  /** Maximum concurrent requests */
-  concurrency: number;
+  /** Delay between sequential page fetches (ms) */
+  pageDelayMs: number;
+  /** Maximum accumulation attempts to collect all companies */
+  maxAccumulationAttempts: number;
+  /** Delay between accumulation attempts (ms) */
+  accumulationDelayMs: number;
 }
 
 const DEFAULT_CONFIG: KkrClientConfig = {
   timeoutMs: 30_000, // 30 seconds
   maxRetries: 3,
-  concurrency: 3, // Be nice to KKR servers
+  pageDelayMs: 100, // 100ms between pages (sequential, reduces CDN edge switching)
+  maxAccumulationAttempts: 5, // Try up to 5 times to collect all companies
+  accumulationDelayMs: 500, // 500ms between accumulation attempts
 };
 
 /**
@@ -54,6 +59,7 @@ export interface AllPagesFetchResult {
   totalHits: number;
   totalPages: number;
   fetchedPages: number;
+  accumulationAttempts: number;
 }
 
 /**
@@ -61,19 +67,25 @@ export interface AllPagesFetchResult {
  *
  * Features:
  * - Page-based pagination (1-indexed)
- * - Retry with exponential backoff
- * - Concurrency limiting
+ * - Retry with exponential backoff per page
+ * - Sequential fetching with delays (reduces CDN inconsistency)
+ * - Accumulation loop to collect all companies despite CDN variability
+ * - Keep-alive HTTP agent (reduces CDN edge switching)
  * - Proper headers to avoid bot detection
  */
 @Injectable()
 export class KkrClient {
   private readonly logger = new Logger(KkrClient.name);
   private readonly config: KkrClientConfig;
-  private readonly limiter: ReturnType<typeof pLimit.default>;
+  private readonly httpAgent: Agent;
 
   constructor() {
     this.config = DEFAULT_CONFIG;
-    this.limiter = pLimit.default(this.config.concurrency);
+    // Keep-alive agent reduces CDN edge switching
+    this.httpAgent = new Agent({
+      keepAliveTimeout: 30_000,
+      keepAliveMaxTimeout: 60_000,
+    });
   }
 
   /**
@@ -98,9 +110,12 @@ export class KkrClient {
           'User-Agent':
             'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
           Accept: 'application/json',
+          'Accept-Language': 'en-US,en;q=0.9',
+          'Cache-Control': 'no-cache',
         },
         headersTimeout: this.config.timeoutMs,
         bodyTimeout: this.config.timeoutMs,
+        dispatcher: this.httpAgent,
       });
 
       if (statusCode === 429) {
@@ -115,7 +130,14 @@ export class KkrClient {
       }
 
       const text = await body.text();
-      return JSON.parse(text) as KkrApiResponse;
+      const parsed = JSON.parse(text) as KkrApiResponse;
+
+      // Validate response has results (retry if empty unexpectedly)
+      if (!parsed.results || !Array.isArray(parsed.results)) {
+        throw new Error(`Page ${pageNumber} returned invalid results`);
+      }
+
+      return parsed;
     };
 
     const response = await pRetry.default(fetchWithRetry, {
@@ -146,80 +168,116 @@ export class KkrClient {
   }
 
   /**
-   * Fetch all pages of portfolio companies.
+   * Fetch all pages of portfolio companies with accumulation loop.
    *
    * Strategy:
-   * 1. Fetch page 1 to get total pages and expected count
-   * 2. Fetch remaining pages with concurrency limit
-   * 3. Validate we got the expected number of items
-   * 4. Return all companies
+   * 1. Fetch all pages sequentially (with delays to reduce CDN edge switching)
+   * 2. Accumulate unique companies by name (stable identifier)
+   * 3. If we haven't collected sourceTotal, retry the entire fetch
+   * 4. Repeat until we have all companies or max attempts reached
+   *
+   * This handles KKR's CDN inconsistency where different requests
+   * return different subsets of companies.
    */
   async fetchAllPages(): Promise<AllPagesFetchResult> {
     this.logger.log('Starting to fetch all portfolio pages...');
 
-    // Fetch first page to get pagination info
-    const firstPageResult = await this.fetchPage(1);
-    const { totalHits, totalPages } = firstPageResult.pagination;
+    // Accumulator: keyed by normalized name (stable across fetches)
+    const accumulated = new Map<string, KkrRawCompany>();
+    let totalHits = 0;
+    let totalPages = 0;
+    let attempt = 0;
 
-    this.logger.log(
-      `First page fetched. Total: ${totalHits} companies across ${totalPages} pages`,
-    );
+    while (attempt < this.config.maxAccumulationAttempts) {
+      attempt++;
 
-    // Collect all companies starting with page 1
-    const allCompanies: KkrRawCompany[] = [...firstPageResult.companies];
+      // Fetch first page to get pagination info
+      const firstPageResult = await this.fetchPage(1);
+      totalHits = firstPageResult.pagination.totalHits;
+      totalPages = firstPageResult.pagination.totalPages;
 
-    if (totalPages <= 1) {
-      return {
-        companies: allCompanies,
-        totalHits,
-        totalPages,
-        fetchedPages: 1,
-      };
-    }
+      if (attempt === 1) {
+        this.logger.log(
+          `First page fetched. Total: ${totalHits} companies across ${totalPages} pages`,
+        );
+      }
 
-    // Fetch remaining pages with concurrency limit
-    const remainingPages = Array.from(
-      { length: totalPages - 1 },
-      (_, i) => i + 2,
-    ); // [2, 3, ..., totalPages]
-
-    const pagePromises = remainingPages.map((pageNum) =>
-      this.limiter(async () => {
-        this.logger.debug(`Fetching page ${pageNum}/${totalPages}...`);
-        const result = await this.fetchPage(pageNum);
-
-        // Validate page has items (except possibly last page)
-        if (result.companies.length === 0) {
-          this.logger.warn(`Page ${pageNum} returned 0 items - may need retry`);
+      // Add companies from first page
+      for (const company of firstPageResult.companies) {
+        const key = company.name.toLowerCase().trim();
+        if (!accumulated.has(key)) {
+          accumulated.set(key, company);
         }
+      }
 
-        return result.companies;
-      }),
-    );
+      // Fetch remaining pages sequentially with delay
+      for (let pageNum = 2; pageNum <= totalPages; pageNum++) {
+        // Small delay between pages to reduce CDN edge switching
+        await this.sleep(this.config.pageDelayMs);
 
-    const pageResults = await Promise.all(pagePromises);
+        try {
+          const result = await this.fetchPage(pageNum);
 
-    for (const companies of pageResults) {
-      allCompanies.push(...companies);
+          for (const company of result.companies) {
+            const key = company.name.toLowerCase().trim();
+            if (!accumulated.has(key)) {
+              accumulated.set(key, company);
+            }
+          }
+        } catch (error) {
+          const errorMsg =
+            error instanceof Error ? error.message : String(error);
+          this.logger.warn(`Failed to fetch page ${pageNum}: ${errorMsg}`);
+          // Continue with other pages
+        }
+      }
+
+      // Check if we've collected all companies
+      if (accumulated.size >= totalHits) {
+        this.logger.log(
+          `Accumulated all ${accumulated.size} companies in ${attempt} attempt(s)`,
+        );
+        break;
+      }
+
+      // Need more attempts - log progress
+      const missing = totalHits - accumulated.size;
+      this.logger.log(
+        `Attempt ${attempt}: accumulated ${accumulated.size}/${totalHits} (missing ${missing}). ` +
+          `Retrying...`,
+      );
+
+      // Delay before next attempt
+      await this.sleep(this.config.accumulationDelayMs * attempt);
     }
 
-    // Warn if we didn't get all expected items
-    if (allCompanies.length < totalHits) {
+    // Final check
+    if (accumulated.size < totalHits) {
       this.logger.warn(
-        `Fetched ${allCompanies.length} companies but API reports ${totalHits} total. ` +
-          `Some pages may have returned incomplete data.`,
+        `After ${attempt} attempts: accumulated ${accumulated.size}/${totalHits} companies. ` +
+          `Some companies may be missing due to upstream CDN inconsistency.`,
       );
     }
 
+    const companies = Array.from(accumulated.values());
+
     this.logger.log(
-      `Fetched all ${totalPages} pages. Total companies: ${allCompanies.length}`,
+      `Fetched all ${totalPages} pages. Total unique companies: ${companies.length}`,
     );
 
     return {
-      companies: allCompanies,
+      companies,
       totalHits,
       totalPages,
       fetchedPages: totalPages,
+      accumulationAttempts: attempt,
     };
+  }
+
+  /**
+   * Sleep helper for delays.
+   */
+  private sleep(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }

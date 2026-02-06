@@ -41,10 +41,10 @@ git clone <repository-url> && cd PortfoRadar
 docker compose up --build
 
 # In another terminal, ingest data
-docker compose exec app npm run ingest
+docker compose exec app npm run ingest:prod
 
 # Verify data
-curl http://localhost:3000/companies | jq '.meta.total'
+curl http://localhost:3000/companies | jq '.total'
 ```
 
 ### Option B: Local Development
@@ -133,7 +133,7 @@ curl http://localhost:3000/companies/abc123def456...
 
 ```json
 {
-  "data": [
+  "items": [
     {
       "companyId": "a1b2c3d4...",
       "name": "Acme Corp",
@@ -149,12 +149,10 @@ curl http://localhost:3000/companies/abc123def456...
       "descriptionText": "A leading technology company..."
     }
   ],
-  "meta": {
-    "page": 1,
-    "limit": 20,
-    "total": 150,
-    "totalPages": 8
-  }
+  "page": 1,
+  "limit": 20,
+  "total": 150,
+  "totalPages": 8
 }
 ```
 
@@ -244,10 +242,69 @@ The Docker setup includes:
 - Health checks for orchestration
 - Volume persistence for MongoDB
 
+## How KKR Portfolio Data Is Retrieved
+
+We fetch KKR portfolio companies from the public portfolio listing endpoint used by [kkr.com/invest/portfolio](https://www.kkr.com/invest/portfolio).
+
+The endpoint behaves like a paginated JSON API:
+
+| Field | Description |
+|-------|-------------|
+| `hits` | Total company count (currently 296) |
+| `pages` | Total pages (currently 20, fixed 15 items/page) |
+| `results` | Array of company records |
+
+**CDN behavior:** The endpoint is served via CDN. In practice, page responses may vary across edge nodes, occasionally returning incomplete sets when pages are fetched concurrently. Our ingestion handles this with an accumulation loop (see below).
+
+## Data Model & Idempotent Storage
+
+Each company is stored in MongoDB with a stable unique `companyId`:
+
+```
+companyId = SHA256(name + hq).substring(0, 32)
+```
+
+**Upsert behavior:**
+- Insert if document missing
+- Update only when `contentHash` differs (hash of all business fields)
+- Skip write entirely if content unchanged
+
+**Guarantees:**
+- **No duplicates** — unique index on `companyId`
+- **Safe repeated runs** — idempotent upserts
+- **Minimal write load** — update-only-if-changed via content hash
+
+## Reliability Guarantees (Completeness Reporting)
+
+We verify completeness by comparing accumulated unique companies against the source-reported total. The CLI output includes:
+
+```
+========================================
+        INGESTION SUMMARY
+========================================
+Run ID:          <uuid>
+Status:          COMPLETED
+Duration:        10854ms
+----------------------------------------
+Fetched:         296
+Unique:          296
+Created:         0
+Updated:         0
+Failed:          0
+----------------------------------------
+Source total:    296
+Source pages:    20
+Accum. attempts: 1
+Complete:        ✅ YES
+========================================
+```
+
+**Accumulation loop:** If the first fetch pass returns fewer than `sourceTotal` companies (due to CDN variability), we retry up to 5 times, accumulating unique companies until complete.
+
 ## Design Decisions
 
 ### 1. Deterministic Company IDs
-Companies are assigned SHA256 hashes (32-char hex) derived from `name + yoi + hq + assetClass + industry`, ensuring idempotent upserts during re-ingestion.
+Companies are assigned SHA256 hashes (32-char hex) derived from `name + hq` (normalized to lowercase), ensuring idempotent upserts during re-ingestion.
 
 ### 2. Field Normalization
 - `assetClassRaw` preserved for display; `assetClasses[]` split for filtering

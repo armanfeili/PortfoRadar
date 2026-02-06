@@ -8,18 +8,34 @@ import { UpsertCompanyDto } from '../../companies/companies.repository';
  * The KKR API does NOT provide unique IDs, so we create one
  * by hashing stable identifying fields.
  *
- * Fields used: name + yoi + hq + assetClass + industry
+ * Strategy:
+ * - Use: name + headquarters (hq)
+ * - These fields are always present and together uniquely identify a company
+ * - Even when companies share logos (e.g., ON*NET Fibra Chile vs Colombia),
+ *   they have different headquarters
+ *
+ * Previously tried approaches that failed:
+ * 1. name + yoi + hq + assetClass + industry - too many variable fields
+ * 2. logo path alone - some companies share logos (ON*NET Fibra Chile/Colombia)
  */
 export function generateCompanyId(raw: KkrRawCompany): string {
-  const normalized = [
+  // Use name + hq as the stable composite key
+  // Both are required fields and together are unique per company
+  const keyParts = [
     raw.name.toLowerCase().trim(),
-    raw.yoi?.trim() ?? '',
-    raw.hq?.toLowerCase().trim() ?? '',
-    raw.assetClass?.toLowerCase().trim() ?? '',
-    raw.industry?.toLowerCase().trim() ?? '',
-  ].join('|');
+    (raw.hq ?? '').toLowerCase().trim(),
+  ];
 
+  const normalized = keyParts.join('|');
   return createHash('sha256').update(normalized).digest('hex').substring(0, 32);
+}
+
+/**
+ * Debug helper: Generate the raw key used for company ID (before hashing).
+ * Useful for identifying which fields caused a collision.
+ */
+export function getCompanyIdKey(raw: KkrRawCompany): string {
+  return `${raw.name.toLowerCase().trim()}|${(raw.hq ?? '').toLowerCase().trim()}`;
 }
 
 /**
@@ -76,6 +92,33 @@ export function splitAssetClasses(assetClassRaw: string): string[] {
 }
 
 /**
+ * Generate a content hash from all business fields.
+ * Used to detect if a company's data has actually changed.
+ *
+ * Excludes volatile fields: source.fetchedAt, createdAt, updatedAt
+ */
+export function generateContentHash(raw: KkrRawCompany): string {
+  // Include all fields that represent business data
+  const content = JSON.stringify({
+    name: raw.name,
+    assetClass: raw.assetClass,
+    industry: raw.industry,
+    region: raw.region,
+    description: raw.description || '',
+    url: raw.url || '',
+    hq: raw.hq || '',
+    yoi: raw.yoi || '',
+    logo: raw.logo || '',
+    relatedLinkOne: raw.relatedLinkOne || '',
+    relatedLinkOneTitle: raw.relatedLinkOneTitle || '',
+    relatedLinkTwo: raw.relatedLinkTwo || '',
+    relatedLinkTwoTitle: raw.relatedLinkTwoTitle || '',
+  });
+
+  return createHash('sha256').update(content).digest('hex').substring(0, 32);
+}
+
+/**
  * Map a raw KKR API company to our UpsertCompanyDto.
  *
  * Handles:
@@ -91,6 +134,7 @@ export function mapRawToCompanyDto(
   listUrl: string,
 ): UpsertCompanyDto {
   const companyId = generateCompanyId(raw);
+  const contentHash = generateContentHash(raw);
 
   // Build related links if present
   const relatedLinks =
@@ -115,6 +159,7 @@ export function mapRawToCompanyDto(
 
   return {
     companyId,
+    contentHash,
     name: raw.name,
     nameSort: raw.name.toLowerCase(),
     assetClassRaw: raw.assetClass,

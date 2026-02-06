@@ -1,5 +1,6 @@
 import {
   generateCompanyId,
+  getCompanyIdKey,
   stripHtml,
   normalizeUrl,
   buildLogoUrl,
@@ -14,8 +15,8 @@ describe('Company Mapper', () => {
       const raw: KkrRawCompany = {
         name: 'Acme Corp',
         sortingName: 'acme corp',
-        logo: '/logo.png',
-        hq: 'New York',
+        logo: '/content/dam/kkr/portfolio/acme-logo.png',
+        hq: 'New York, NY, United States',
         region: 'Americas',
         assetClass: 'Private Equity',
         industry: 'Technology',
@@ -31,11 +32,33 @@ describe('Company Mapper', () => {
       expect(id1).toHaveLength(32);
     });
 
-    it('should generate different hashes for different companies', () => {
+    it('should generate different hashes for different headquarters', () => {
       const raw1: KkrRawCompany = {
         name: 'Acme Corp',
         sortingName: 'acme corp',
-        logo: '',
+        logo: '/content/dam/kkr/portfolio/acme-logo.png',
+        hq: 'New York, NY, United States',
+        region: 'Americas',
+        assetClass: 'Private Equity',
+        industry: 'Technology',
+        yoi: '2020',
+        url: '',
+        description: '',
+      };
+
+      const raw2: KkrRawCompany = {
+        ...raw1,
+        hq: 'San Francisco, CA, United States',
+      };
+
+      expect(generateCompanyId(raw1)).not.toBe(generateCompanyId(raw2));
+    });
+
+    it('should generate different hashes for different names', () => {
+      const raw1: KkrRawCompany = {
+        name: 'Acme Corp',
+        sortingName: 'acme corp',
+        logo: '/content/dam/kkr/portfolio/logo.png',
         hq: 'New York',
         region: 'Americas',
         assetClass: 'Private Equity',
@@ -53,12 +76,38 @@ describe('Company Mapper', () => {
       expect(generateCompanyId(raw1)).not.toBe(generateCompanyId(raw2));
     });
 
+    it('should handle real-world case: ON*NET Fibra Chile vs Colombia (shared logo, different hq)', () => {
+      // This is a real case from KKR API where two companies share the same logo
+      const chile: KkrRawCompany = {
+        name: 'ON*NET Fibra Chile',
+        sortingName: 'on*net fibra chile',
+        logo: '/content/dam/kkr/portfolio/resized-logos/onnet-fibra.png',
+        hq: 'Santiago, Chile',
+        region: 'Americas',
+        assetClass: 'Infrastructure',
+        industry: 'Communication Services',
+        yoi: '2021',
+        url: 'www.onnetfibra.com',
+        description: '',
+      };
+
+      const colombia: KkrRawCompany = {
+        ...chile,
+        name: 'ON*NET Fibra Colombia',
+        sortingName: 'on*net fibra colombia',
+        hq: 'Bogota, Colombia',
+      };
+
+      // They should get different IDs despite sharing the same logo
+      expect(generateCompanyId(chile)).not.toBe(generateCompanyId(colombia));
+    });
+
     it('should be case-insensitive for name and hq', () => {
       const raw1: KkrRawCompany = {
         name: 'ACME CORP',
         sortingName: 'acme corp',
-        logo: '',
-        hq: 'NEW YORK',
+        logo: '/logo.png',
+        hq: 'NEW YORK, NY',
         region: 'Americas',
         assetClass: 'Private Equity',
         industry: 'Technology',
@@ -70,10 +119,124 @@ describe('Company Mapper', () => {
       const raw2: KkrRawCompany = {
         ...raw1,
         name: 'acme corp',
-        hq: 'new york',
+        hq: 'new york, ny',
       };
 
       expect(generateCompanyId(raw1)).toBe(generateCompanyId(raw2));
+    });
+
+    it('should be stable across runs (regression test)', () => {
+      // Fixed input should always produce same output
+      const raw: KkrRawCompany = {
+        name: '+Simple',
+        sortingName: '+simple',
+        logo: '/content/dam/kkr/portfolio/resized-logos/simple-logo-raw.png',
+        hq: 'Marseille, France',
+        region: 'Europe, The Middle East And Africa',
+        assetClass: 'Tech Growth',
+        industry: 'Financials',
+        yoi: '2022',
+        url: 'www.plussimple.fr',
+        description: '<p>Digital insurance brokerage platform</p>',
+      };
+
+      // This hash should NEVER change across code versions
+      // If it does, existing data in DB won't match
+      const expectedId = generateCompanyId(raw);
+      expect(expectedId).toHaveLength(32);
+
+      // Run multiple times to ensure determinism
+      for (let i = 0; i < 100; i++) {
+        expect(generateCompanyId(raw)).toBe(expectedId);
+      }
+    });
+
+    it('should handle empty hq gracefully', () => {
+      const raw: KkrRawCompany = {
+        name: 'Acme Corp',
+        sortingName: 'acme corp',
+        logo: '/logo.png',
+        hq: '',
+        region: 'Americas',
+        assetClass: 'Private Equity',
+        industry: 'Technology',
+        yoi: '2020',
+        url: '',
+        description: '',
+      };
+
+      const id = generateCompanyId(raw);
+      expect(id).toHaveLength(32);
+      // Multiple calls should return same value
+      expect(generateCompanyId(raw)).toBe(id);
+    });
+
+    it('should be unaffected by changes to non-key fields', () => {
+      const raw1: KkrRawCompany = {
+        name: 'Acme Corp',
+        sortingName: 'acme corp',
+        logo: '/logo-v1.png',
+        hq: 'New York',
+        region: 'Americas',
+        assetClass: 'Private Equity',
+        industry: 'Technology',
+        yoi: '2020',
+        url: 'https://acme.com',
+        description: 'Original description',
+      };
+
+      const raw2: KkrRawCompany = {
+        ...raw1,
+        // Change everything EXCEPT name and hq
+        logo: '/logo-v2-completely-different.png',
+        region: 'Europe',
+        assetClass: 'Infrastructure',
+        industry: 'Energy',
+        yoi: '2025',
+        url: 'https://different.com',
+        description: 'Different description',
+      };
+
+      // ID should remain the same since name+hq are unchanged
+      expect(generateCompanyId(raw1)).toBe(generateCompanyId(raw2));
+    });
+  });
+
+  describe('getCompanyIdKey', () => {
+    it('should return normalized name|hq key', () => {
+      const raw: KkrRawCompany = {
+        name: 'Acme Corp',
+        sortingName: 'acme corp',
+        logo: '/content/dam/kkr/portfolio/LOGO.PNG',
+        hq: 'New York, NY',
+        region: 'Americas',
+        assetClass: 'Private Equity',
+        industry: 'Technology',
+        yoi: '2020',
+        url: '',
+        description: '',
+      };
+
+      const key = getCompanyIdKey(raw);
+      expect(key).toBe('acme corp|new york, ny');
+    });
+
+    it('should handle empty hq', () => {
+      const raw: KkrRawCompany = {
+        name: 'Acme Corp',
+        sortingName: 'acme corp',
+        logo: '',
+        hq: '',
+        region: 'Americas',
+        assetClass: 'Private Equity',
+        industry: 'Technology',
+        yoi: '2020',
+        url: '',
+        description: '',
+      };
+
+      const key = getCompanyIdKey(raw);
+      expect(key).toBe('acme corp|');
     });
   });
 

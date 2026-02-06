@@ -31,18 +31,22 @@ async function bootstrap() {
     console.log(`Duration:        ${result.durationMs}ms`);
     console.log('----------------------------------------');
     console.log(`Fetched:         ${result.counts.fetched}`);
+    console.log(`Unique:          ${result.uniqueThisRun}`);
     console.log(`Created:         ${result.counts.created}`);
     console.log(`Updated:         ${result.counts.updated}`);
     console.log(`Failed:          ${result.counts.failed}`);
     console.log('----------------------------------------');
     console.log(`Source total:    ${result.sourceMeta.totalFromSource}`);
     console.log(`Source pages:    ${result.sourceMeta.pagesFromSource}`);
+    console.log(`Accum. attempts: ${result.sourceMeta.accumulationAttempts}`);
+    console.log(`Complete:        ${result.isComplete ? '✅ YES' : '⚠️  NO'}`);
     console.log('========================================\n');
 
-    // Verify: fetched should equal source total
-    if (result.counts.fetched !== result.sourceMeta.totalFromSource) {
+    // Warn if incomplete
+    if (!result.isComplete) {
       logger.warn(
-        `⚠️  Fetched (${result.counts.fetched}) != Source total (${result.sourceMeta.totalFromSource})`,
+        `⚠️  Collected ${result.counts.fetched}/${result.sourceMeta.totalFromSource} companies. ` +
+          `Run again to accumulate missing companies.`,
       );
     }
 

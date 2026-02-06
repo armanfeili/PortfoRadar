@@ -31,6 +31,8 @@ export interface UpsertCompanyDto {
     endpoint: string;
     fetchedAt: Date;
   };
+  /** Content hash of business fields for change detection */
+  contentHash?: string;
 }
 
 /**
@@ -88,6 +90,7 @@ export class CompaniesRepository {
   /**
    * Insert or update a company by companyId.
    * Idempotent: same data produces same result, no duplicates.
+   * Only updates if contentHash differs (avoids unnecessary writes).
    */
   async upsertCompany(dto: UpsertCompanyDto): Promise<UpsertResult> {
     const existingDoc = await this.companyModel.findOne({
@@ -95,6 +98,11 @@ export class CompaniesRepository {
     });
 
     if (existingDoc) {
+      // Only update if content actually changed
+      if (dto.contentHash && existingDoc.contentHash === dto.contentHash) {
+        return { companyId: dto.companyId, created: false, updated: false };
+      }
+
       // Update existing document
       await this.companyModel.updateOne({ companyId: dto.companyId }, dto);
       return { companyId: dto.companyId, created: false, updated: true };

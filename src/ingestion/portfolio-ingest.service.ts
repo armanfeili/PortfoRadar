@@ -1,6 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { KkrClient, KKR_PORTFOLIO_URL } from './kkr-client/kkr.client';
-import { mapRawToCompanyDto } from './mappers/company.mapper';
+import {
+  mapRawToCompanyDto,
+  generateCompanyId,
+  getCompanyIdKey,
+} from './mappers/company.mapper';
 import { CompaniesRepository } from '../companies/companies.repository';
 import { IngestionRunRepository } from './ingestion-run.repository';
 import { KkrRawCompany } from './kkr-client/kkr-api.types';
@@ -20,8 +24,13 @@ export interface IngestionResult {
   sourceMeta: {
     totalFromSource: number;
     pagesFromSource: number;
+    accumulationAttempts: number;
   };
   durationMs: number;
+  /** Number of unique companies after de-duplication */
+  uniqueThisRun: number;
+  /** Whether we collected all companies from source */
+  isComplete: boolean;
 }
 
 /**
@@ -68,22 +77,30 @@ export class PortfolioIngestService {
 
     let totalFromSource = 0;
     let pagesFromSource = 0;
+    let accumulationAttempts = 0;
+    let uniqueThisRun = 0;
 
     try {
-      // 2. Fetch all pages
+      // 2. Fetch all pages (with accumulation loop for CDN reliability)
       const fetchResult = await this.kkrClient.fetchAllPages();
       totalFromSource = fetchResult.totalHits;
       pagesFromSource = fetchResult.totalPages;
+      accumulationAttempts = fetchResult.accumulationAttempts;
       counts.fetched = fetchResult.companies.length;
 
       this.logger.log(
-        `Fetched ${counts.fetched} companies from ${pagesFromSource} pages`,
+        `Fetched ${counts.fetched} unique companies from ${pagesFromSource} pages ` +
+          `(${accumulationAttempts} accumulation attempt${accumulationAttempts > 1 ? 's' : ''})`,
       );
 
-      // 3. De-duplicate by companyId in memory
-      const uniqueCompanies = this.deduplicateCompanies(fetchResult.companies);
+      // 3. De-duplicate by companyId in memory (log collisions for debugging)
+      const uniqueCompanies = this.deduplicateCompanies(
+        fetchResult.companies,
+        true,
+      );
+      uniqueThisRun = uniqueCompanies.size;
       this.logger.log(
-        `After de-duplication: ${uniqueCompanies.size} unique companies`,
+        `After de-duplication: ${uniqueThisRun} unique companies`,
       );
 
       // 4. Upsert each company
@@ -127,18 +144,29 @@ export class PortfolioIngestService {
       });
 
       const durationMs = Date.now() - startTime;
+      const isComplete = counts.fetched >= totalFromSource;
+
       this.logger.log(
         `Ingestion complete in ${durationMs}ms: ` +
           `${counts.fetched} fetched, ${counts.created} created, ` +
           `${counts.updated} updated, ${counts.failed} failed`,
       );
 
+      if (!isComplete) {
+        this.logger.warn(
+          `⚠️  Incomplete: collected ${counts.fetched}/${totalFromSource} companies. ` +
+            `Run again to accumulate missing companies.`,
+        );
+      }
+
       return {
         runId: run.runId,
         status: 'completed',
         counts,
-        sourceMeta: { totalFromSource, pagesFromSource },
+        sourceMeta: { totalFromSource, pagesFromSource, accumulationAttempts },
         durationMs,
+        uniqueThisRun,
+        isComplete,
       };
     } catch (error) {
       // Fatal error — update run as failed
@@ -161,8 +189,10 @@ export class PortfolioIngestService {
         runId: run.runId,
         status: 'failed',
         counts,
-        sourceMeta: { totalFromSource, pagesFromSource },
+        sourceMeta: { totalFromSource, pagesFromSource, accumulationAttempts },
         durationMs: Date.now() - startTime,
+        uniqueThisRun,
+        isComplete: false,
       };
     }
   }
@@ -171,17 +201,59 @@ export class PortfolioIngestService {
    * De-duplicate companies by companyId.
    *
    * Same company may appear multiple times if fetched with different filters.
-   * Uses a Map to keep the last occurrence of each company.
+   * Uses a Map to keep the first occurrence of each company.
+   *
+   * Also logs collision examples when multiple raw items map to the same ID.
    */
   private deduplicateCompanies(
     companies: KkrRawCompany[],
+    logCollisions: boolean = false,
   ): Map<string, KkrRawCompany> {
     const map = new Map<string, KkrRawCompany>();
+    const collisions: Map<string, KkrRawCompany[]> = new Map();
 
     for (const raw of companies) {
-      // Use the mapper's hash function to get consistent IDs
-      const dto = mapRawToCompanyDto(raw, '', '');
-      map.set(dto.companyId, raw);
+      const companyId = generateCompanyId(raw);
+
+      if (map.has(companyId)) {
+        // Track collisions for debugging
+        if (!collisions.has(companyId)) {
+          collisions.set(companyId, [map.get(companyId)!]);
+        }
+        collisions.get(companyId)!.push(raw);
+      } else {
+        map.set(companyId, raw);
+      }
+    }
+
+    // Log collision examples (useful for debugging ID stability issues)
+    if (logCollisions && collisions.size > 0) {
+      this.logger.debug(`Found ${collisions.size} IDs with collisions:`);
+      let count = 0;
+      for (const [id, items] of collisions) {
+        if (count >= 5) {
+          this.logger.debug(`... and ${collisions.size - 5} more`);
+          break;
+        }
+        const key = getCompanyIdKey(items[0]);
+        this.logger.debug(
+          `  ID ${id.substring(0, 8)}... (key: ${key}): ${items.length} items`,
+        );
+        for (const item of items) {
+          this.logger.debug(
+            `    - "${item.name}" | logo: ${item.logo?.substring(0, 50) || 'EMPTY'}`,
+          );
+        }
+        count++;
+      }
+    }
+
+    // Log summary of duplicates (these are expected - same company across pages)
+    const duplicateCount = companies.length - map.size;
+    if (duplicateCount > 0) {
+      this.logger.debug(
+        `De-duplication removed ${duplicateCount} duplicate entries (same company seen multiple times)`,
+      );
     }
 
     return map;

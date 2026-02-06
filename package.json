@@ -15,6 +15,7 @@
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "ingest": "ts-node src/ingest.ts",
+    "ingest:prod": "node dist/ingest.js",
     "verify:data": "ts-node src/scripts/verify-data.ts",
     "test": "jest",
     "test:watch": "jest --watch",

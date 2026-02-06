@@ -118,6 +118,13 @@ export class Company {
   /** Source metadata for provenance tracking */
   @Prop({ required: true, type: SourceMeta })
   source: SourceMeta;
+
+  /**
+   * Content hash of business fields (excludes timestamps/source metadata).
+   * Used to detect if company data actually changed between ingestions.
+   */
+  @Prop({ index: true })
+  contentHash?: string;
 }
 
 export const CompanySchema = SchemaFactory.createForClass(Company);
