@@ -1249,14 +1249,13 @@ git commit -m "docs: complete README with setup and usage"
 - [x] **Live URL documented** in README with Live Demo section
 - [x] **Ingestion via HTTP endpoint** (`POST /admin/ingest`):
   - Swagger-callable endpoint for triggering ingestion without CLI
-  - Protected by `X-Admin-Key` header (env: `ADMIN_API_KEY`)
+  - Protected by temporary keys (generate via `POST /admin/keys`)
   - Returns detailed result (runId, counts, duration, isComplete)
   - Works with same code path as CLI ingestion
 
 **Environment variables for deployment:**
 - `MONGO_URI` — MongoDB connection string (required)
 - `NODE_ENV=production` — Enables production logging
-- `ADMIN_API_KEY` — API key for admin endpoints (required in production)
 
 ---
 
