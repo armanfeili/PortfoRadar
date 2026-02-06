@@ -195,7 +195,7 @@ curl https://your-app.railway.app/companies | jq '.total'
 # Should return > 0 after successful ingestion
 ```
 
-> **Security:** In production (`NODE_ENV=production`), `ADMIN_API_KEY` must be set. In development, the endpoint works without a key (with a warning log).
+> **Security:** Admin endpoints require a valid temporary key (generated via `POST /admin/keys`). Keys expire automatically based on TTL.
 
 ### Query Parameters for `/companies`
 

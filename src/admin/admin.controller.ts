@@ -27,8 +27,8 @@ import { AdminKeyResponseDto } from './dto/admin-key-response.dto';
 /**
  * Admin controller for privileged operations.
  *
- * All endpoints require X-Admin-Key header authentication.
- * Accepts either the master ADMIN_API_KEY or a valid temporary key.
+ * Protected endpoints require X-Admin-Key header with a valid temporary key.
+ * Generate keys via POST /admin/keys (public endpoint).
  */
 @ApiTags('Admin')
 @ApiSecurity('X-Admin-Key')
