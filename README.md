@@ -136,23 +136,59 @@ Interactive Swagger documentation available at `/api/docs` when running.
 | GET | `/companies/:id` | Get single company by ID |
 | GET | `/stats` | Aggregated statistics |
 | GET | `/health` | Health check |
+| POST | `/admin/keys` | Generate temporary admin key (requires master key) |
+| DELETE | `/admin/keys/:keyId` | Revoke a temporary key |
 | POST | `/admin/ingest` | Trigger data ingestion (requires `X-Admin-Key` header) |
+
+### Temporary Admin Keys
+
+Generate short-lived API keys instead of using your long-lived master key for every request.
+
+**Generate a temporary key:**
+```bash
+curl -X POST https://your-app.railway.app/admin/keys \
+  -H "X-Admin-Key: your-master-admin-key" \
+  -H "Content-Type: application/json" \
+  -d '{"ttlMinutes": 30}'
+```
+
+Response (token shown **once only**):
+```json
+{
+  "keyId": "507f1f77bcf86cd799439011",
+  "token": "ak_a1b2c3d4e5f6...",
+  "expiresAt": "2026-02-06T16:30:00.000Z",
+  "ttlMinutes": 30
+}
+```
+
+**Use the temp key:**
+```bash
+curl -X POST https://your-app.railway.app/admin/ingest \
+  -H "X-Admin-Key: ak_a1b2c3d4e5f6..."
+```
+
+**Via Swagger UI:**
+1. Open `/api/docs`
+2. Find **Admin → POST /admin/keys**
+3. Enter your master `ADMIN_API_KEY` in the `X-Admin-Key` header
+4. Execute to get a temporary token
+5. Use that token for subsequent `/admin/ingest` calls
+
+> **Security Notes:**
+> - Token is shown **once only** — store it securely
+> - TTL: 5-1440 minutes (default: 30)
+> - MongoDB TTL index auto-deletes expired keys
+> - Revoke manually via `DELETE /admin/keys/:keyId`
 
 ### Ingesting Data on Deployed Instance
 
 The `/admin/ingest` endpoint allows triggering data ingestion without CLI access — perfect for deployed instances.
 
-**Via Swagger UI:**
-1. Open `/api/docs`
-2. Find **Admin → POST /admin/ingest**
-3. Click "Try it out"
-4. Enter your `ADMIN_API_KEY` in the `X-Admin-Key` header field
-5. Execute — ingestion takes ~30-60 seconds
-
 **Via curl:**
 ```bash
 curl -X POST https://your-app.railway.app/admin/ingest \
-  -H "X-Admin-Key: your-secret-admin-key"
+  -H "X-Admin-Key: your-admin-key-or-ak_xxx"
 ```
 
 **Verify:**
