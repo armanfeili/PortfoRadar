@@ -120,7 +120,6 @@ open http://localhost:3000/api/docs
 | `MONGO_URI` | — | MongoDB connection string **(required)** |
 | `NODE_ENV` | `development` | Environment mode |
 | `LOG_LEVEL` | `info` | Log level (debug/info/warn/error) |
-| `ADMIN_API_KEY` | — | API key for `/admin/*` endpoints (required in production) |
 | `THROTTLE_TTL` | `60` | Rate limit window in seconds |
 | `THROTTLE_LIMIT` | `100` | Max requests per window |
 
