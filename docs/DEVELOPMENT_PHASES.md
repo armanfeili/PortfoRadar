@@ -1209,9 +1209,11 @@ git commit -m "docs: complete README with setup and usage"
 ---
 
 
-### 8.4 Configuration Management — Env Vars & Secrets
+### 8.4 Configuration Management — Env Vars & Secrets ✅
 
 > **Evaluation**: "Use of environment variables vs hardcoded variables; Secrets management"
+
+**Status**: ✅ **COMPLETE** — All configuration and secrets management enhancements implemented.
 
 **Already done** (Phase 2):
 - [x] `@nestjs/config` with Zod validation (`src/config/env.validation.ts`)
@@ -1219,22 +1221,21 @@ git commit -m "docs: complete README with setup and usage"
 - [x] `.env` git-ignored (never committed)
 - [x] App fails fast with clear error if required env vars are missing
 
-**Remaining enhancements**:
-- [ ] **Secrets management**: Document how to handle secrets in production:
-  - Use cloud provider secret managers (AWS Secrets Manager, GCP Secret Manager, etc.)
-  - Use Docker secrets or Kubernetes secrets for containerized deployments
-  - Never log sensitive values (mask `MONGO_URI` in logs)
-- [ ] **Environment-specific configs**: Support `NODE_ENV` to toggle behavior (e.g., `development` vs `production` logging level)
-- [ ] **Add optional env vars** for bonus features:
-  ```bash
-  # .env.example additions
-  NODE_ENV=development          # development | production
-  LOG_LEVEL=info                # debug | info | warn | error
-  RATE_LIMIT_TTL=60             # Rate limit window in seconds
-  RATE_LIMIT_MAX=100            # Max requests per window
-  ```
+**Completed enhancements**:
+- [x] **Secrets management**: Documented in [docs/SECRETS_MANAGEMENT.md](SECRETS_MANAGEMENT.md):
+  - Cloud provider secret managers (AWS, GCP, Azure)
+  - Docker secrets and Kubernetes secrets
+  - Log masking: MONGO_URI automatically redacted via Pino redact config
+- [x] **Environment-specific configs**: 
+  - `NODE_ENV` toggles pino-pretty (dev) vs JSON logs (prod)
+  - `LOG_LEVEL` env var for configurable log level (debug/info/warn/error)
+- [x] **Optional env vars** documented in `.env.example`:
+  - `LOG_LEVEL=info`
+  - `THROTTLE_TTL=60`
+  - `THROTTLE_LIMIT=100`
 
 ---
+
 
 ### 8.5 Deployment — Cloud Hosting
 
@@ -1368,7 +1369,7 @@ npm install helmet @nestjs/throttler
 | UX (REST API + Swagger + HATEOAS) | ✅ Done (Phase 8.1) | — |
 | Linter (ESLint + Prettier) | ✅ Done (Phase 1) | — |
 | Container (Docker + Compose) | ✅ Done (Phase 7) | — |
-| Config Management (env vars) | ✅ Done (Phase 2) | — |
+| Config Management (env vars) | ✅ Done (Phase 8.4) | — |
 | Push image to registry | ✅ Done (Phase 8.3) | — |
 | Cloud deployment | ⬜ Not started | 🟡 Medium |
 | Extended test coverage | ⬜ Not started | 🟡 Medium |

@@ -19,7 +19,11 @@ import { IngestionModule } from './ingestion/ingestion.module';
           process.env.NODE_ENV !== 'production'
             ? { target: 'pino-pretty', options: { colorize: true } }
             : undefined,
-        level: process.env.NODE_ENV !== 'production' ? 'debug' : 'info',
+        level: process.env.LOG_LEVEL || 'info',
+        redact: {
+          paths: ['req.headers.authorization', 'MONGO_URI', '*.MONGO_URI'],
+          censor: '[REDACTED]',
+        },
       },
     }),
     DatabaseModule,
