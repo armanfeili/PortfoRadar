@@ -139,7 +139,9 @@ function printCollisionReport(
       if (shown >= 20) break;
       shown++;
 
-      console.log(`${shown}. Key: "${keyFn(items[0])}" (${items.length} items)`);
+      console.log(
+        `${shown}. Key: "${keyFn(items[0])}" (${items.length} items)`,
+      );
       for (const item of items) {
         console.log(`   - name: "${item.name}"`);
         console.log(`     hq: "${item.hq ?? 'EMPTY'}"`);
@@ -175,11 +177,19 @@ async function main() {
 
   // Define strategies to test
   const strategies = [
-    { name: 'name + hq (CURRENT)', idFn: generateIdNameHq, keyFn: getKeyNameHq },
+    {
+      name: 'name + hq (CURRENT)',
+      idFn: generateIdNameHq,
+      keyFn: getKeyNameHq,
+    },
     { name: 'name + logo', idFn: generateIdNameLogo, keyFn: getKeyNameLogo },
     { name: 'name + url', idFn: generateIdNameUrl, keyFn: getKeyNameUrl },
     { name: 'logo only', idFn: generateIdLogoOnly, keyFn: getKeyLogoOnly },
-    { name: 'name + logo + hq', idFn: generateIdComposite, keyFn: getKeyComposite },
+    {
+      name: 'name + logo + hq',
+      idFn: generateIdComposite,
+      keyFn: getKeyComposite,
+    },
   ];
 
   const results: { name: string; analysis: CollisionAnalysis }[] = [];
@@ -187,7 +197,12 @@ async function main() {
   for (const strategy of strategies) {
     const analysis = analyzeCollisions(companies, strategy.idFn);
     results.push({ name: strategy.name, analysis });
-    printCollisionReport(strategy.name, companies.length, analysis, strategy.keyFn);
+    printCollisionReport(
+      strategy.name,
+      companies.length,
+      analysis,
+      strategy.keyFn,
+    );
   }
 
   // Summary comparison

@@ -1126,19 +1126,44 @@ git commit -m "docs: complete README with setup and usage"
 
 ---
 
-### 8.1 UX — Effectiveness of Interaction
+### 8.1 UX — Effectiveness of Interaction ✅
 
 > **Evaluation**: "Effectiveness of interaction (REST API, CLI, UI, DB Console)"
+
+**Status**: ✅ **COMPLETE** — HATEOAS links, consistent error format, CLI docs, and mongosh one-liners all implemented.
 
 **Already done** (Phases 5 & 7):
 - [x] REST API with filters, pagination, and search (`GET /companies`, `GET /companies/:id`, `GET /stats`)
 - [x] Swagger UI at `/api/docs` for interactive API exploration
 - [x] Docker Compose for one-command setup
 
-**Remaining enhancements**:
-- [ ] **CLI commands** for common operations (e.g., `npm run ingest`, `npm run verify:data` — already exist, document clearly)
-- [ ] **API response improvements**: Add HATEOAS-style links, consistent error response format
-- [ ] **DB Console queries**: Document useful `mongosh` one-liners in README for reviewers who prefer DB-level inspection
+**Completed enhancements**:
+- [x] **CLI commands documented**: `npm run ingest`, `npm run verify:data` with expected output in README
+- [x] **API response improvements**: HATEOAS-style pagination links (`_links.self`, `_links.prev`, `_links.next`, `_links.first`, `_links.last`)
+- [x] **Consistent error format**: Global `HttpExceptionFilter` with standardized error responses (statusCode, error, message, path, timestamp)
+- [x] **DB Console queries**: Comprehensive `mongosh` one-liners documented in README for reviewers
+
+### Verification Results
+
+| Check | Command | Result |
+|-------|---------|--------|
+| Lint passes | `npm run lint` | ✅ No errors |
+| Build passes | `npm run build` | ✅ No errors |
+| Tests pass | `npm run test` | ✅ 37 tests passing |
+| HATEOAS links | `curl localhost:3000/companies?limit=2 \| jq '._links'` | ✅ `{self, prev, next, last}` |
+| Error format | `curl localhost:3000/companies/nonexistent` | ✅ `{statusCode, error, message, path, timestamp}` |
+| Docker works | `docker compose up --build` | ✅ App + Mongo start, API responds |
+
+### Files Created/Modified
+
+| File | Status | Description |
+|------|--------|-------------|
+| `src/common/filters/http-exception.filter.ts` | Created | Global exception filter for consistent errors |
+| `src/common/filters/index.ts` | Created | Barrel export |
+| `src/main.ts` | Modified | Register global HttpExceptionFilter |
+| `src/companies/dto/company-response.dto.ts` | Modified | Added `PaginationLinksDto` and `_links` field |
+| `src/companies/companies.service.ts` | Modified | Added `buildPaginationLinks()` method |
+| `README.md` | Modified | CLI usage guide + mongosh one-liners
 
 ---
 
@@ -1351,7 +1376,7 @@ npm install helmet @nestjs/throttler
 
 | Bonus Category | Status | Priority |
 |----------------|--------|----------|
-| UX (REST API + Swagger) | ✅ Done (Phase 5) | — |
+| UX (REST API + Swagger + HATEOAS) | ✅ Done (Phase 8.1) | — |
 | Linter (ESLint + Prettier) | ✅ Done (Phase 1) | — |
 | Container (Docker + Compose) | ✅ Done (Phase 7) | — |
 | Config Management (env vars) | ✅ Done (Phase 2) | — |

@@ -45,7 +45,7 @@ export class QueryCompaniesDto {
 
   @ApiPropertyOptional({
     description: 'Search by company name (case-insensitive partial match)',
-    example: 'acme',
+    example: 'beacon',
   })
   @IsOptional()
   @IsString()
@@ -54,8 +54,10 @@ export class QueryCompaniesDto {
 
   @ApiPropertyOptional({
     description: 'Page number (1-indexed)',
+    type: 'integer',
     default: 1,
     minimum: 1,
+    example: 1,
   })
   @IsOptional()
   @Type(() => Number)
@@ -65,9 +67,11 @@ export class QueryCompaniesDto {
 
   @ApiPropertyOptional({
     description: 'Number of items per page',
+    type: 'integer',
     default: 20,
     minimum: 1,
     maximum: 100,
+    example: 20,
   })
   @IsOptional()
   @Type(() => Number)

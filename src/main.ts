@@ -5,12 +5,16 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Logger } from 'nestjs-pino';
 import { AppModule } from './app.module';
 import { EnvConfig } from './config/env.validation';
+import { HttpExceptionFilter } from './common/filters';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
 
   // Use pino logger for all logs
   app.useLogger(app.get(Logger));
+
+  // Apply global exception filter for consistent error responses
+  app.useGlobalFilters(new HttpExceptionFilter());
 
   // Enable global validation pipe with security settings
   app.useGlobalPipes(

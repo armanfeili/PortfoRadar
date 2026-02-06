@@ -97,7 +97,13 @@ async function main() {
 
   // Find companies where HQ differs between fetches
   const hqDiffs: { name: string; hq1: string; hq2: string }[] = [];
-  const idDiffs: { name: string; id1: string; id2: string; key1: string; key2: string }[] = [];
+  const idDiffs: {
+    name: string;
+    id1: string;
+    id2: string;
+    key1: string;
+    key2: string;
+  }[] = [];
 
   for (const [nameKey, s1] of snap1) {
     const s2 = snap2.get(nameKey);
@@ -106,7 +112,13 @@ async function main() {
         hqDiffs.push({ name: s1.name, hq1: s1.hq, hq2: s2.hq });
       }
       if (s1.id !== s2.id) {
-        idDiffs.push({ name: s1.name, id1: s1.id, id2: s2.id, key1: s1.key, key2: s2.key });
+        idDiffs.push({
+          name: s1.name,
+          id1: s1.id,
+          id2: s2.id,
+          key1: s1.key,
+          key2: s2.key,
+        });
       }
     }
   }
@@ -170,7 +182,8 @@ async function main() {
     for (const name of onlyIn1.slice(0, 10)) {
       console.log(`  - ${name}`);
     }
-    if (onlyIn1.length > 10) console.log(`  ... and ${onlyIn1.length - 10} more`);
+    if (onlyIn1.length > 10)
+      console.log(`  ... and ${onlyIn1.length - 10} more`);
   }
 
   if (onlyIn2.length > 0) {
@@ -178,7 +191,8 @@ async function main() {
     for (const name of onlyIn2.slice(0, 10)) {
       console.log(`  - ${name}`);
     }
-    if (onlyIn2.length > 10) console.log(`  ... and ${onlyIn2.length - 10} more`);
+    if (onlyIn2.length > 10)
+      console.log(`  ... and ${onlyIn2.length - 10} more`);
   }
 
   await app.close();

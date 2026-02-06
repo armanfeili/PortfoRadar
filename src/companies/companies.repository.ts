@@ -179,9 +179,11 @@ export class CompaniesRepository {
     }
 
     // Execute query with pagination
+    // Exclude MongoDB internal fields (_id, __v) from API responses
     const [items, total] = await Promise.all([
       this.companyModel
         .find(query)
+        .select('-_id -__v')
         .sort({ [sortBy]: sortOrder === 'asc' ? 1 : -1 })
         .skip(skip)
         .limit(limit)
@@ -201,9 +203,14 @@ export class CompaniesRepository {
 
   /**
    * Find a single company by its unique companyId.
+   * Excludes MongoDB internal fields (_id, __v) from API responses.
    */
   async findByCompanyId(companyId: string): Promise<Company | null> {
-    return this.companyModel.findOne({ companyId }).lean<Company>().exec();
+    return this.companyModel
+      .findOne({ companyId })
+      .select('-_id -__v')
+      .lean<Company>()
+      .exec();
   }
 
   /**
