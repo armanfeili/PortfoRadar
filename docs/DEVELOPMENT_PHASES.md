@@ -1310,29 +1310,65 @@ git commit -m "docs: complete README with setup and usage"
 
 ---
 
-### 8.8 Security Hardening
+### 8.8 Security Hardening ✅
 
 ```bash
 npm install helmet @nestjs/throttler
 ```
 
-- [ ] **Helmet** — Set secure HTTP headers:
-  ```typescript
-  import helmet from 'helmet';
-  app.use(helmet());
-  ```
-- [ ] **Rate limiting** — Prevent abuse with `@nestjs/throttler`:
-  ```typescript
-  ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }])
-  ```
-- [ ] **CORS configuration** — Restrict origins in production:
-  ```typescript
-  app.enableCors({ origin: process.env.ALLOWED_ORIGINS?.split(',') || '*' });
-  ```
-- [ ] **Input size limits** — Prevent oversized payloads:
-  ```typescript
-  app.use(json({ limit: '1mb' }));
-  ```
+**Status**: ✅ **COMPLETE** — Basic security hardening applied at the HTTP layer.
+
+**Already done**:
+- [x] `helmet` and `@nestjs/throttler` installed (see `package.json` dependencies)
+
+**Completed enhancements**:
+- [x] **Helmet** — Set secure HTTP headers:
+  - Registered in `main.ts`:
+    ```typescript
+    import helmet from 'helmet';
+    app.use(helmet());
+    ```
+- [x] **Rate limiting** — Prevent abuse with `@nestjs/throttler`:
+  - Configured centrally in `AppModule` using env-driven settings:
+    ```typescript
+    ThrottlerModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService<EnvConfig, true>) => [
+        {
+          ttl: configService.get('THROTTLE_TTL', { infer: true }),
+          limit: configService.get('THROTTLE_LIMIT', { infer: true }),
+        },
+      ],
+    });
+    ```
+  - Applied globally via `APP_GUARD`:
+    ```typescript
+    providers: [
+      {
+        provide: APP_GUARD,
+        useClass: ThrottlerGuard,
+      },
+    ],
+    ```
+- [x] **CORS configuration** — Restrict origins in production:
+  - Added optional `ALLOWED_ORIGINS` env var (validated by Zod in `env.validation.ts`)
+  - Configured in `main.ts`:
+    ```typescript
+    const allowedOrigins =
+      configService.get('ALLOWED_ORIGINS', { infer: true }) ?? undefined;
+    const corsOrigin =
+      process.env.NODE_ENV === 'production' && allowedOrigins
+        ? allowedOrigins.split(',').map((origin) => origin.trim())
+        : '*';
+
+    app.enableCors({ origin: corsOrigin });
+    ```
+- [x] **Input size limits** — Prevent oversized payloads:
+  - Added JSON body size limit in `main.ts`:
+    ```typescript
+    import { json } from 'express';
+    app.use(json({ limit: '1mb' }));
+    ```
 
 ---
 

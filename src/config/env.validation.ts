@@ -19,6 +19,7 @@ export const envSchema = z.object({
   LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
   THROTTLE_TTL: z.coerce.number().int().positive().default(60),
   THROTTLE_LIMIT: z.coerce.number().int().positive().default(100),
+  ALLOWED_ORIGINS: z.string().optional(),
 });
 
 export type EnvConfig = z.infer<typeof envSchema>;

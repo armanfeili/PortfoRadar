@@ -122,6 +122,7 @@ open http://localhost:3000/api/docs
 | `LOG_LEVEL` | `info` | Log level (debug/info/warn/error) |
 | `THROTTLE_TTL` | `60` | Rate limit window in seconds |
 | `THROTTLE_LIMIT` | `100` | Max requests per window |
+| `ALLOWED_ORIGINS` | — | Optional comma-separated list of allowed origins (e.g. `https://app.com,https://admin.app.com`). If unset or in non-production, CORS is fully open (`*`). |
 
 ## API Documentation
 

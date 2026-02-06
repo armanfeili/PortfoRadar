@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { LoggerModule } from 'nestjs-pino';
-import { validateEnv } from './config/env.validation';
+import { EnvConfig, validateEnv } from './config/env.validation';
 import { DatabaseModule } from './database/database.module';
 import { HealthModule } from './health/health.module';
 import { CompaniesModule } from './companies/companies.module';
@@ -13,6 +15,15 @@ import { AdminModule } from './admin/admin.module';
     ConfigModule.forRoot({
       isGlobal: true,
       validate: validateEnv,
+    }),
+    ThrottlerModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService<EnvConfig, true>) => [
+        {
+          ttl: configService.get('THROTTLE_TTL', { infer: true }),
+          limit: configService.get('THROTTLE_LIMIT', { infer: true }),
+        },
+      ],
     }),
     LoggerModule.forRoot({
       pinoHttp: {
@@ -32,6 +43,12 @@ import { AdminModule } from './admin/admin.module';
     CompaniesModule,
     IngestionModule,
     AdminModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
 })
 export class AppModule {}
