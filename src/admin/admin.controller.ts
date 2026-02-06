@@ -45,25 +45,18 @@ export class AdminController {
    * Generate a temporary admin key.
    *
    * The returned token is shown ONCE ONLY. Store it securely.
-   * Use it in the X-Admin-Key header for subsequent requests.
+   * Use it in the X-Admin-Key header for subsequent admin requests.
    *
-   * Note: Only the master ADMIN_API_KEY can generate temporary keys.
+   * This endpoint is public — no authentication required.
    */
   @Post('keys')
   @HttpCode(201)
-  @UseGuards(AdminApiKeyGuard)
   @ApiOperation({
     summary: 'Generate a temporary admin key',
     description:
       'Creates a short-lived admin key that can be used for authentication. ' +
       'The token is shown ONCE ONLY in the response — store it securely. ' +
-      'Requires the master ADMIN_API_KEY for authentication.',
-  })
-  @ApiHeader({
-    name: 'X-Admin-Key',
-    description: 'Master admin API key (ADMIN_API_KEY from environment)',
-    required: true,
-    example: 'your-master-admin-key',
+      'No authentication required to generate a key.',
   })
   @ApiBody({ type: CreateAdminKeyDto, required: false })
   @ApiResponse({
@@ -74,10 +67,6 @@ export class AdminController {
   @ApiResponse({
     status: 400,
     description: 'Invalid TTL value',
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Missing or invalid master admin key',
   })
   async generateKey(
     @Body() dto: CreateAdminKeyDto,

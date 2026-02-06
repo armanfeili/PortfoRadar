@@ -142,12 +142,11 @@ Interactive Swagger documentation available at `/api/docs` when running.
 
 ### Temporary Admin Keys
 
-Generate short-lived API keys instead of using your long-lived master key for every request.
+Generate short-lived API keys for admin operations.
 
-**Generate a temporary key:**
+**Generate a temporary key (no auth required):**
 ```bash
 curl -X POST https://your-app.railway.app/admin/keys \
-  -H "X-Admin-Key: your-master-admin-key" \
   -H "Content-Type: application/json" \
   -d '{"ttlMinutes": 30}'
 ```
@@ -162,7 +161,7 @@ Response (token shown **once only**):
 }
 ```
 
-**Use the temp key:**
+**Use the temp key for admin operations:**
 ```bash
 curl -X POST https://your-app.railway.app/admin/ingest \
   -H "X-Admin-Key: ak_a1b2c3d4e5f6..."
@@ -171,9 +170,9 @@ curl -X POST https://your-app.railway.app/admin/ingest \
 **Via Swagger UI:**
 1. Open `/api/docs`
 2. Find **Admin → POST /admin/keys**
-3. Enter your master `ADMIN_API_KEY` in the `X-Admin-Key` header
-4. Execute to get a temporary token
-5. Use that token for subsequent `/admin/ingest` calls
+3. Execute (no header required)
+4. Copy the returned token
+5. Use that token in `X-Admin-Key` header for `/admin/ingest`
 
 > **Security Notes:**
 > - Token is shown **once only** — store it securely
