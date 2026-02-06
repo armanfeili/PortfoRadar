@@ -1237,29 +1237,29 @@ git commit -m "docs: complete README with setup and usage"
 ---
 
 
-### 8.5 Deployment — Cloud Hosting
+### 8.5 Deployment — Cloud Hosting ✅
 
 > **Evaluation**: "App deployed online and works remotely"
 
-- [ ] **Deploy to a cloud platform** (pick one):
+**Status**: ✅ **COMPLETE** — App deployed to Railway with HTTP ingestion endpoint.
 
-  | Platform | Pros | Notes |
-  |----------|------|-------|
-  | **Railway** | Easy, free tier, supports Docker | Recommended for speed |
-  | **Render** | Free tier, auto-deploy from Git | Good alternative |
-  | **Fly.io** | Edge deployment, Docker-native | More config needed |
-  | **AWS ECS / GCP Cloud Run** | Production-grade | Overkill for demo |
+**Completed items**:
+- [x] **Deployed to Railway** (cloud platform with Docker support)
+- [x] **Using Railway MongoDB plugin** (managed MongoDB for deployed instance)
+- [x] **Live URL documented** in README with Live Demo section
+- [x] **Ingestion via HTTP endpoint** (`POST /admin/ingest`):
+  - Swagger-callable endpoint for triggering ingestion without CLI
+  - Protected by `X-Admin-Key` header (env: `ADMIN_API_KEY`)
+  - Returns detailed result (runId, counts, duration, isComplete)
+  - Works with same code path as CLI ingestion
 
-- [ ] **Use managed MongoDB** (e.g., MongoDB Atlas free tier) for the deployed instance
-- [ ] **Document the live URL** in README:
-  ```markdown
-  ## 🌐 Live Demo
-  - API: https://portfolioradar.example.com/companies
-  - Swagger: https://portfolioradar.example.com/api/docs
-  ```
-- [ ] Ensure ingestion can run against the deployed instance
+**Environment variables for deployment:**
+- `MONGO_URI` — MongoDB connection string (required)
+- `NODE_ENV=production` — Enables production logging
+- `ADMIN_API_KEY` — API key for admin endpoints (required in production)
 
 ---
+
 
 ### 8.6 Tests — Automated Testing & Coverage
 
@@ -1371,7 +1371,7 @@ npm install helmet @nestjs/throttler
 | Container (Docker + Compose) | ✅ Done (Phase 7) | — |
 | Config Management (env vars) | ✅ Done (Phase 8.4) | — |
 | Push image to registry | ✅ Done (Phase 8.3) | — |
-| Cloud deployment | ⬜ Not started | 🟡 Medium |
+| Cloud deployment | ✅ Done (Phase 8.5) | — |
 | Extended test coverage | ⬜ Not started | 🟡 Medium |
 | CD pipeline | ⬜ Not started | 🟢 Low |
 | Security hardening | ⬜ Not started | 🟢 Low |

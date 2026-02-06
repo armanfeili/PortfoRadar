@@ -4,6 +4,16 @@
 
 A NestJS application that ingests and serves KKR's investment portfolio company data through a queryable REST API.
 
+## 🌐 Live Demo
+
+| Resource | URL |
+|----------|-----|
+| **API** | https://portfolioradar-production.up.railway.app |
+| **Swagger UI** | https://portfolioradar-production.up.railway.app/api/docs |
+| **Health** | https://portfolioradar-production.up.railway.app/health |
+
+> **Note**: If the deployed instance shows 0 companies, ingestion may need to be triggered. See [Ingesting Data on Deployed Instance](#ingesting-data-on-deployed-instance).
+
 ## Overview
 
 PortfoRadar fetches portfolio company information from KKR's public API, normalizes the data, and stores it in MongoDB. It provides a comprehensive REST API with filtering, pagination, full-text search, and aggregated statistics.
@@ -107,8 +117,12 @@ open http://localhost:3000/api/docs
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `PORT` | `3000` | HTTP server port |
-| `MONGO_URI` | `mongodb://localhost:27017/portfolioradar` | MongoDB connection string |
+| `MONGO_URI` | — | MongoDB connection string **(required)** |
 | `NODE_ENV` | `development` | Environment mode |
+| `LOG_LEVEL` | `info` | Log level (debug/info/warn/error) |
+| `ADMIN_API_KEY` | — | API key for `/admin/*` endpoints (required in production) |
+| `THROTTLE_TTL` | `60` | Rate limit window in seconds |
+| `THROTTLE_LIMIT` | `100` | Max requests per window |
 
 ## API Documentation
 
@@ -122,8 +136,32 @@ Interactive Swagger documentation available at `/api/docs` when running.
 | GET | `/companies/:id` | Get single company by ID |
 | GET | `/stats` | Aggregated statistics |
 | GET | `/health` | Health check |
+| POST | `/admin/ingest` | Trigger data ingestion (requires `X-Admin-Key` header) |
 
-> **Note:** Data ingestion is performed via CLI (`npm run ingest`), not through an HTTP endpoint.
+### Ingesting Data on Deployed Instance
+
+The `/admin/ingest` endpoint allows triggering data ingestion without CLI access — perfect for deployed instances.
+
+**Via Swagger UI:**
+1. Open `/api/docs`
+2. Find **Admin → POST /admin/ingest**
+3. Click "Try it out"
+4. Enter your `ADMIN_API_KEY` in the `X-Admin-Key` header field
+5. Execute — ingestion takes ~30-60 seconds
+
+**Via curl:**
+```bash
+curl -X POST https://your-app.railway.app/admin/ingest \
+  -H "X-Admin-Key: your-secret-admin-key"
+```
+
+**Verify:**
+```bash
+curl https://your-app.railway.app/companies | jq '.total'
+# Should return > 0 after successful ingestion
+```
+
+> **Security:** In production (`NODE_ENV=production`), `ADMIN_API_KEY` must be set. In development, the endpoint works without a key (with a warning log).
 
 ### Query Parameters for `/companies`
 
