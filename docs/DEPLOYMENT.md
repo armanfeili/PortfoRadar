@@ -44,7 +44,7 @@ All deployments require these environment variables:
    PORT=3000
    ```
 
-5. **Deploy**: Railway auto-detects the Dockerfile and builds. Your app will be available at a generated URL like `https://portfolioradar-production.up.railway.app`.
+5. **Deploy**: Railway auto-detects the Dockerfile and builds. Your app will be available at a generated URL like `https://portforadar-production.up.railway.app`.
 
 6. **Run ingestion** (one-time, after deploy):
    ```bash

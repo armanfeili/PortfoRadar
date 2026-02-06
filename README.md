@@ -8,9 +8,9 @@ A NestJS application that ingests and serves KKR's investment portfolio company 
 
 | Resource | URL |
 |----------|-----|
-| **API** | https://portfolioradar-production.up.railway.app |
-| **Swagger UI** | https://portfolioradar-production.up.railway.app/api/docs |
-| **Health** | https://portfolioradar-production.up.railway.app/health |
+| **API** | https://portforadar-production.up.railway.app |
+| **Swagger UI** | https://portforadar-production.up.railway.app/api/docs |
+| **Health** | https://portforadar-production.up.railway.app/health |
 
 > **Note**: If the deployed instance shows 0 companies, ingestion may need to be triggered. See [Ingesting Data on Deployed Instance](#ingesting-data-on-deployed-instance).
 
