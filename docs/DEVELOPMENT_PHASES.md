@@ -1183,38 +1183,31 @@ git commit -m "docs: complete README with setup and usage"
 
 ---
 
-### 8.3 Container — Dockerization & Registry
+### 8.3 Container — Dockerization & Registry ✅
 
 > **Evaluation**: "App is containerized (Docker), image is pushed to container registry"
+
+**Status**: ✅ **COMPLETE** — Docker image built and pushed to GHCR via CI pipeline.
 
 **Already done** (Phase 7):
 - [x] Multi-stage `Dockerfile` (Node 20 Alpine, non-root user)
 - [x] `docker-compose.yml` with App + MongoDB services
 - [x] `.dockerignore` for build exclusions
 - [x] `docker compose up --build` works end-to-end
+- [x] Health check in `docker-compose.yml` for app service (using `/health` endpoint)
 
-**Remaining enhancements**:
-- [ ] **Push image to container registry** (Docker Hub or GitHub Container Registry):
-  ```bash
-  # Tag and push to Docker Hub
-  docker build -t <username>/portfolioradar:latest .
-  docker push <username>/portfolioradar:latest
-  
-  # Or GitHub Container Registry
-  docker build -t ghcr.io/<username>/portfolioradar:latest .
-  docker push ghcr.io/<username>/portfolioradar:latest
-  ```
-- [ ] **Add Docker image build to CI pipeline** (`.github/workflows/ci.yml`):
-  ```yaml
-  - name: Build and push Docker image
-    uses: docker/build-push-action@v5
-    with:
-      push: true
-      tags: ghcr.io/${{ github.repository }}:latest
-  ```
-- [ ] Add health check in `docker-compose.yml` for app service (using `/health` endpoint)
+**Completed enhancements**:
+- [x] **Push image to container registry** (GitHub Container Registry):
+  - CI pipeline pushes to `ghcr.io/<owner>/portfolioradar` on merge to `main`
+  - Tags: `:latest` (default branch) and `:<sha>` (commit hash)
+- [x] **Docker image build/push added to CI pipeline** (`.github/workflows/ci.yml`):
+  - Uses `docker/build-push-action@v5` with GHCR login
+  - Only pushes on `main` branch (not PRs)
+  - Includes Docker layer caching for faster builds
+- [x] **Documentation**: See [docs/CONTAINER_REGISTRY.md](CONTAINER_REGISTRY.md) for pull/run instructions
 
 ---
+
 
 ### 8.4 Configuration Management — Env Vars & Secrets
 
@@ -1376,12 +1369,12 @@ npm install helmet @nestjs/throttler
 | Linter (ESLint + Prettier) | ✅ Done (Phase 1) | — |
 | Container (Docker + Compose) | ✅ Done (Phase 7) | — |
 | Config Management (env vars) | ✅ Done (Phase 2) | — |
-| Push image to registry | ⬜ Not started | 🟡 Medium |
+| Push image to registry | ✅ Done (Phase 8.3) | — |
 | Cloud deployment | ⬜ Not started | 🟡 Medium |
 | Extended test coverage | ⬜ Not started | 🟡 Medium |
 | CD pipeline | ⬜ Not started | 🟢 Low |
 | Security hardening | ⬜ Not started | 🟢 Low |
-| Pre-commit hooks | ⬜ Not started | 🟢 Low |
+| Pre-commit hooks | ✅ Done (Phase 8.2) | — |
 | AI usage documentation | ⬜ Not started | 🟢 Low |
 
 ---

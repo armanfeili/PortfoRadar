@@ -1,5 +1,7 @@
 # PortfoRadar
 
+[![CI](https://github.com/armanfeili/PortfoRadar/actions/workflows/ci.yml/badge.svg)](https://github.com/armanfeili/PortfoRadar/actions/workflows/ci.yml)
+
 A NestJS application that ingests and serves KKR's investment portfolio company data through a queryable REST API.
 
 ## Overview
@@ -47,7 +49,33 @@ docker compose exec app npm run ingest:prod
 curl http://localhost:3000/companies | jq '.total'
 ```
 
-### Option B: Local Development
+### Option B: Pre-built Docker Image
+
+Pull the pre-built image from GitHub Container Registry:
+
+```bash
+# Pull latest image
+docker pull ghcr.io/armanfeili/portfolioradar:latest
+
+# Start MongoDB
+docker run -d --name mongo -p 27017:27017 mongo:7
+
+# Run the app
+docker run -d --name portfolioradar \
+  -p 3000:3000 \
+  -e MONGO_URI=mongodb://host.docker.internal:27017/portfolioradar \
+  ghcr.io/armanfeili/portfolioradar:latest
+
+# Ingest data
+docker exec portfolioradar node dist/ingest.js
+
+# Verify
+curl http://localhost:3000/companies | jq '.total'
+```
+
+> See [docs/CONTAINER_REGISTRY.md](docs/CONTAINER_REGISTRY.md) for more details.
+
+### Option C: Local Development
 
 **Prerequisites:**
 - Node.js 20.x (`nvm use` if using nvm)
