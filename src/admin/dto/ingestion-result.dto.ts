@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 /**
  * Ingestion counts breakdown.
  */
-class IngestionCountsDto {
+export class IngestionCountsDto {
   @ApiProperty({
     example: 296,
     description: 'Total companies fetched from source',
@@ -23,7 +23,7 @@ class IngestionCountsDto {
 /**
  * Source metadata from the ingestion.
  */
-class SourceMetaDto {
+export class SourceMetaDto {
   @ApiProperty({
     example: 296,
     description: 'Total companies reported by source API',
