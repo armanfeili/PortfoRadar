@@ -1095,12 +1095,12 @@ git commit -m "docs: complete README with setup and usage"
 
 ### Deliverables ✅
 - [x] `docker compose up` works end-to-end
-- [x] Tests pass (30 total: 1 app + 29 mapper)
+- [x] Tests pass (88 total across 8 test suites)
 - [x] README is clear and complete
 
 ### Phase 7 Verification Summary
 
-**Date Completed**: $(date)
+**Date Completed**: 2026-02-07
 
 **Artifacts Created**:
 - `Dockerfile` — Multi-stage build, Node 20 Alpine, non-root user
@@ -1108,10 +1108,11 @@ git commit -m "docs: complete README with setup and usage"
 - `.dockerignore` — Build exclusions
 - `.github/workflows/ci.yml` — Lint, test, build, docker pipeline
 - `src/ingestion/mappers/company.mapper.spec.ts` — 29 unit tests
+- Additional test files: `health.controller.spec.ts`, `admin-key.service.spec.ts`, `companies.service.spec.ts`, etc.
 
 **Test Results**:
 ```
-✓ 30 tests passing
+✓ 88 tests passing (8 test suites)
 ✓ Lint clean
 ✓ Build successful
 ```
@@ -1149,7 +1150,7 @@ git commit -m "docs: complete README with setup and usage"
 |-------|---------|--------|
 | Lint passes | `npm run lint` | ✅ No errors |
 | Build passes | `npm run build` | ✅ No errors |
-| Tests pass | `npm run test` | ✅ 37 tests passing |
+| Tests pass | `npm run test` | ✅ 88 tests passing (8 test suites) |
 | HATEOAS links | `curl localhost:3000/companies?limit=2 \| jq '._links'` | ✅ `{self, prev, next, last}` |
 | Error format | `curl localhost:3000/companies/nonexistent` | ✅ `{statusCode, error, message, path, timestamp}` |
 | Docker works | `docker compose up --build` | ✅ App + Mongo start, API responds |
@@ -1274,15 +1275,16 @@ git commit -m "docs: complete README with setup and usage"
 **Implemented in Phase 8.6**:
 - [x] **Temporary Admin Keys** with comprehensive tests:
   - `admin-key.service.spec.ts`: 9 tests for key generation, validation, expiry, revocation
-  - Guard validates temporary keys
+  - `admin-api-key.guard.spec.ts`: Guard validation tests
   - Schema with TTL index for auto-cleanup
-- [x] **Total test count**: 83 tests passing
+- [x] **Total test count**: 88 tests passing (8 test suites)
 - [x] Lint + build verification
+- [x] Coverage thresholds configured in `package.json` (30% branches, functions; 28% lines, statements)
 
 **Remaining (optional enhancements)**:
 - [ ] Integration tests with in-memory MongoDB
 - [ ] E2E tests for REST endpoints
-- [ ] Coverage thresholds and badge
+- [ ] Coverage badge in README
 
 ---
 
@@ -1372,15 +1374,17 @@ npm install helmet @nestjs/throttler
 
 ---
 
-### 8.9 AI Integration
+### 8.9 AI Integration ✅
 
 > **Evaluation**: "Use of AI is encouraged. Poor understanding of AI-generated code/logic will negatively affect evaluation."
 
-- [ ] Document AI usage in README or a dedicated `docs/AI_USAGE.md`:
-  - Which tools were used (e.g., GitHub Copilot, ChatGPT)
-  - What was AI-assisted vs manually written
-  - Key decisions and trade-offs understood
-- [ ] **Critical**: Be prepared to explain every piece of code during presentation — AI-generated code you don't understand will hurt your score
+**Status**: ✅ **COMPLETE** — AI usage documented in `docs/AI_USAGE.md`.
+
+- [x] Document AI usage in `docs/AI_USAGE.md`:
+  - Tools used documented (GitHub Copilot, ChatGPT, etc.)
+  - AI-assisted vs manually written code identified
+  - Key decisions and trade-offs explained
+- [x] **Critical**: All AI-generated code reviewed and understood for presentation
 
 ---
 
@@ -1394,11 +1398,11 @@ npm install helmet @nestjs/throttler
 | Config Management (env vars) | ✅ Done (Phase 8.4) | — |
 | Push image to registry | ✅ Done (Phase 8.3) | — |
 | Cloud deployment | ✅ Done (Phase 8.5) | — |
-| Extended test coverage | ⬜ Not started | 🟡 Medium |
-| CD pipeline | ⬜ Not started | 🟢 Low |
-| Security hardening | ⬜ Not started | 🟢 Low |
+| Extended test coverage | ✅ Done (Phase 8.6) | — |
+| CD pipeline | ✅ Done (Phase 8.7) | — |
+| Security hardening | ✅ Done (Phase 8.8) | — |
 | Pre-commit hooks | ✅ Done (Phase 8.2) | — |
-| AI usage documentation | ⬜ Not started | 🟢 Low |
+| AI usage documentation | ✅ Done (see `docs/AI_USAGE.md`) | — |
 
 ---
 

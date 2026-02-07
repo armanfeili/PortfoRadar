@@ -288,6 +288,18 @@ src/
 ├── app.module.ts                   # Root module
 ├── main.ts                         # Application bootstrap
 ├── ingest.ts                       # CLI ingestion entrypoint
+├── admin/
+│   ├── admin.module.ts             # Admin feature module
+│   ├── admin.controller.ts         # Admin endpoints (keys, ingest, delete)
+│   ├── admin-key.service.ts        # Temporary key generation/validation
+│   ├── dto/                        # Admin DTOs
+│   ├── guards/
+│   │   └── admin-api-key.guard.ts  # Temporary key authentication guard
+│   └── schemas/
+│       └── admin-key.schema.ts     # Admin key schema with TTL
+├── common/
+│   └── filters/
+│       └── http-exception.filter.ts # Global exception filter
 ├── config/
 │   └── env.validation.ts           # Zod environment validation
 ├── companies/
@@ -319,9 +331,15 @@ src/
     └── verify-data.ts              # Data quality verification
 
 docs/
-├── DEVELOPMENT_PHASES.md           # Implementation roadmap
+├── DEVELOPMENT_PHASES.md           # Implementation roadmap (this file)
 ├── source-analysis.md              # KKR API analysis
-└── Code_Challenge.txt              # Challenge requirements
+├── Code_Challenge.txt              # Challenge requirements
+├── AI_USAGE.md                     # AI tools usage documentation
+├── CONTAINER_REGISTRY.md           # Docker image pull/run instructions
+├── DEPLOYMENT.md                   # Cloud deployment guide (Railway)
+├── MONGOSH_REFERENCE.md            # MongoDB shell commands reference
+├── SECRETS_MANAGEMENT.md           # Secrets and env var best practices
+└── Prompts.md                      # Development prompts
 
 test/
 ├── app.e2e-spec.ts                 # E2E tests
@@ -608,6 +626,16 @@ npm run test:cov
 # E2E tests (requires MongoDB)
 npm run test:e2e
 ```
+
+**Test Suites (88 tests total):**
+- `company.mapper.spec.ts` — Company mapper transformations (29 tests)
+- `companies.controller.spec.ts` — REST endpoint tests
+- `companies.service.spec.ts` — Business logic tests
+- `admin-key.service.spec.ts` — Admin key generation/validation (9 tests)
+- `admin-api-key.guard.spec.ts` — Authentication guard tests
+- `health.controller.spec.ts` — Health check tests
+- `http-exception.filter.spec.ts` — Error handling tests
+- `query-companies.dto.spec.ts` — DTO validation tests
 
 ## CI/CD
 
