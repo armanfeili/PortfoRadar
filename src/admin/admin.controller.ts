@@ -27,7 +27,7 @@ import { IngestionResultDto } from './dto/ingestion-result.dto';
 import { CreateAdminKeyDto } from './dto/create-admin-key.dto';
 import { AdminKeyResponseDto } from './dto/admin-key-response.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
-import { Company } from '../companies/schemas/company.schema';
+import { CompanyResponseDto } from '../companies/dto/company-response.dto';
 
 /**
  * Admin controller for privileged operations.
@@ -251,7 +251,7 @@ export class AdminController {
   @ApiResponse({
     status: 200,
     description: 'Company updated successfully',
-    type: Company,
+    type: CompanyResponseDto,
   })
   @ApiResponse({
     status: 404,
@@ -264,7 +264,7 @@ export class AdminController {
   async updateCompany(
     @Param('id') companyId: string,
     @Body() dto: UpdateCompanyDto,
-  ): Promise<Company> {
+  ): Promise<CompanyResponseDto> {
     this.logger.log(`Updating company ${companyId}`);
 
     const updated = await this.companiesRepository.updateByCompanyId(
@@ -278,6 +278,7 @@ export class AdminController {
 
     this.logger.log(`Successfully updated company ${companyId}`);
 
-    return updated;
+    // Cast Mongoose document to response DTO (lean() returns plain objects)
+    return updated as unknown as CompanyResponseDto;
   }
 }
