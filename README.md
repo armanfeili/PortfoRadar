@@ -141,6 +141,7 @@ Interactive Swagger documentation available at `/api/docs` when running.
 | DELETE | `/admin/keys/:keyId` | Revoke a temporary key |
 | POST | `/admin/ingest` | Trigger data ingestion (requires `X-Admin-Key` header) |
 | DELETE | `/admin/companies` | Delete all companies (requires `X-Admin-Key` header) |
+| PATCH | `/admin/companies/:id` | Update a single company (requires `X-Admin-Key` header) |
 
 ### Temporary Admin Keys
 

@@ -6,7 +6,9 @@ import {
   HttpCode,
   Logger,
   Delete,
+  Patch,
   Param,
+  NotFoundException,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -24,6 +26,8 @@ import { CompaniesRepository } from '../companies/companies.repository';
 import { IngestionResultDto } from './dto/ingestion-result.dto';
 import { CreateAdminKeyDto } from './dto/create-admin-key.dto';
 import { AdminKeyResponseDto } from './dto/admin-key-response.dto';
+import { UpdateCompanyDto } from './dto/update-company.dto';
+import { Company } from '../companies/schemas/company.schema';
 
 /**
  * Admin controller for privileged operations.
@@ -214,5 +218,66 @@ export class AdminController {
       deleted: deletedCount,
       message: `Successfully deleted ${deletedCount} companies`,
     };
+  }
+
+  /**
+   * Update a single company by its companyId.
+   *
+   * Only the fields provided in the request body will be updated.
+   * The companyId cannot be changed.
+   */
+  @Patch('companies/:id')
+  @HttpCode(200)
+  @UseGuards(AdminApiKeyGuard)
+  @ApiOperation({
+    summary: 'Update a company by ID',
+    description:
+      'Updates a single company record. Only provided fields are updated (partial update). ' +
+      'The companyId cannot be modified. If the name is changed, nameSort is automatically updated. ' +
+      'Requires X-Admin-Key header with a valid temporary key.',
+  })
+  @ApiHeader({
+    name: 'X-Admin-Key',
+    description: 'Temporary admin key generated via POST /admin/keys',
+    required: true,
+    example: 'ak_a1b2c3d4e5f6...',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'The companyId of the company to update',
+    example: 'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4',
+  })
+  @ApiBody({ type: UpdateCompanyDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Company updated successfully',
+    type: Company,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Company not found',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Missing or invalid X-Admin-Key header',
+  })
+  async updateCompany(
+    @Param('id') companyId: string,
+    @Body() dto: UpdateCompanyDto,
+  ): Promise<Company> {
+    this.logger.log(`Updating company ${companyId}`);
+
+    const updated = await this.companiesRepository.updateByCompanyId(
+      companyId,
+      dto,
+    );
+
+    if (!updated) {
+      throw new NotFoundException(`Company with id '${companyId}' not found`);
+    }
+
+    this.logger.log(`Successfully updated company ${companyId}`);
+
+    return updated;
   }
 }

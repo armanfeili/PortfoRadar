@@ -253,6 +253,36 @@ export class CompaniesRepository {
   }
 
   /**
+   * Update a company by its companyId.
+   * Returns the updated company or null if not found.
+   *
+   * Note: This updates only the provided fields (partial update).
+   * The nameSort field is automatically recomputed if name changes.
+   */
+  async updateByCompanyId(
+    companyId: string,
+    updates: Partial<Omit<Company, 'companyId' | 'source'>>,
+  ): Promise<Company | null> {
+    // If name is being updated, also update nameSort
+    const updateData: Record<string, unknown> = { ...updates };
+    if (updates.name) {
+      updateData.nameSort = updates.name.toLowerCase();
+    }
+
+    const result = await this.companyModel
+      .findOneAndUpdate(
+        { companyId },
+        { $set: updateData },
+        { new: true, runValidators: true },
+      )
+      .select('-_id -__v')
+      .lean<Company>()
+      .exec();
+
+    return result;
+  }
+
+  /**
    * Delete all companies (use with caution - mainly for testing).
    */
   async deleteAll(): Promise<number> {
