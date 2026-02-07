@@ -529,32 +529,7 @@ docker compose exec mongo mongosh portfolioradar --quiet --eval \
   'db.ingestionruns.findOne({}, { sort: { startedAt: -1 } })'
 ```
 
-## Docker
 
-### Build Image
-
-```bash
-docker build -t portfolioradar .
-```
-
-### Run with Docker Compose
-
-```bash
-# Start app + MongoDB
-docker compose up -d
-
-# View logs
-docker compose logs -f app
-
-# Stop
-docker compose down
-```
-
-The Docker setup includes:
-- Multi-stage build for minimal image size
-- Non-root user for security
-- Health checks for orchestration
-- Volume persistence for MongoDB
 
 ## How KKR Portfolio Data Is Retrieved
 
@@ -618,7 +593,7 @@ Complete:        ✅ YES
 ## Design Decisions
 
 ### 1. Deterministic Company IDs
-Companies are assigned SHA256 hashes (32-char hex) derived from `name + hq` (normalized to lowercase), ensuring idempotent upserts during re-ingestion.
+See [Data Model & Idempotent Storage](#data-model--idempotent-storage).
 
 ### 2. Field Normalization
 - `assetClassRaw` preserved for display; `assetClasses[]` split for filtering
