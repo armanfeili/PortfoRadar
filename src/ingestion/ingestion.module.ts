@@ -7,6 +7,7 @@ import {
 import { KkrClient } from './kkr-client/kkr.client';
 import { IngestionRunRepository } from './ingestion-run.repository';
 import { PortfolioIngestService } from './portfolio-ingest.service';
+import { ScheduledIngestionService } from './scheduled-ingestion.service';
 import { CompaniesModule } from '../companies/companies.module';
 
 @Module({
@@ -16,7 +17,12 @@ import { CompaniesModule } from '../companies/companies.module';
     ]),
     CompaniesModule, // Import to access CompaniesRepository
   ],
-  providers: [KkrClient, IngestionRunRepository, PortfolioIngestService],
+  providers: [
+    KkrClient,
+    IngestionRunRepository,
+    PortfolioIngestService,
+    ScheduledIngestionService,
+  ],
   exports: [PortfolioIngestService, IngestionRunRepository],
 })
 export class IngestionModule {}

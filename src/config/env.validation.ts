@@ -19,7 +19,16 @@ export const envSchema = z.object({
   LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
   THROTTLE_TTL: z.coerce.number().int().positive().default(60),
   THROTTLE_LIMIT: z.coerce.number().int().positive().default(100),
+  // CORS: Comma-separated frontend origins allowed to call this API (e.g., 'https://my-app.com')
+  // Only needed if you have a SEPARATE frontend app calling this backend
+  // Leave unset for same-origin (Swagger UI) or to allow all origins (*)
   ALLOWED_ORIGINS: z.string().optional(),
+  // Scheduled ingestion config (enabled by default)
+  ENABLE_SCHEDULED_INGEST: z
+    .enum(['true', 'false'])
+    .default('true')
+    .transform((v) => v === 'true'),
+  INGEST_CRON: z.string().default('0 3 * * *'), // Default: daily at 3 AM UTC
 });
 
 export type EnvConfig = z.infer<typeof envSchema>;

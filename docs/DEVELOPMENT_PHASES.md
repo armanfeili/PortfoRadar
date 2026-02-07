@@ -76,6 +76,10 @@ MONGO_URI=mongodb://localhost:27017/portfolioradar
 # Optional (Phase 8 bonus)
 ENABLE_NL_QUERY=false
 OPENAI_API_KEY=
+
+# Scheduled Ingestion (enabled by default)
+ENABLE_SCHEDULED_INGEST=true    # Automatic cron-based ingestion
+INGEST_CRON=0 3 * * *           # Cron expression (default: daily at 3 AM UTC)
 ```
 
 ---
@@ -1354,6 +1358,9 @@ npm install helmet @nestjs/throttler
     ```
 - [x] **CORS configuration** — Restrict origins in production:
   - Added optional `ALLOWED_ORIGINS` env var (validated by Zod in `env.validation.ts`)
+  - CORS is for frontend apps at different domains calling this API
+  - Only needed if you have a separate frontend app (e.g., React) calling this backend
+  - Leave unset for same-origin (Swagger UI) or to allow all origins
   - Configured in `main.ts`:
     ```typescript
     const allowedOrigins =
@@ -1385,6 +1392,28 @@ npm install helmet @nestjs/throttler
   - AI-assisted vs manually written code identified
   - Key decisions and trade-offs explained
 - [x] **Critical**: All AI-generated code reviewed and understood for presentation
+
+---
+
+### 8.10 Scheduled Ingestion ✅
+
+> **Feature**: Automatic data refresh via cron-based scheduling
+
+**Status**: ✅ **COMPLETE** — Cron-based ingestion using `@nestjs/schedule`.
+
+**What was implemented**:
+- [x] Installed `@nestjs/schedule` for cron job support
+- [x] Created `ScheduledIngestionService` with configurable cron expression
+- [x] Added `ENABLE_SCHEDULED_INGEST` env var (default: `true` - enabled by default)
+- [x] Added `INGEST_CRON` env var (default: `0 3 * * *` = daily at 3 AM UTC)
+- [x] Logs next scheduled run on startup when enabled
+- [x] Graceful error handling for scheduled jobs
+
+**Configuration:**
+```bash
+ENABLE_SCHEDULED_INGEST=true
+INGEST_CRON=0 3 * * *    # Daily at 3 AM UTC
+```
 
 ---
 

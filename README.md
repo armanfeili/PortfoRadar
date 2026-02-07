@@ -123,7 +123,27 @@ open http://localhost:3000/api/docs
 | `LOG_LEVEL` | `info` | Log level (debug/info/warn/error) |
 | `THROTTLE_TTL` | `60` | Rate limit window in seconds |
 | `THROTTLE_LIMIT` | `100` | Max requests per window |
-| `ALLOWED_ORIGINS` | — | Optional comma-separated list of allowed origins (e.g. `https://app.com,https://admin.app.com`). If unset or in non-production, CORS is fully open (`*`). |
+| `ALLOWED_ORIGINS` | — | CORS: Comma-separated frontend domains that can call this API. Only needed if you have a separate frontend app (e.g., React) at a different domain. Leave unset for same-origin requests or to allow all. |
+| `ENABLE_SCHEDULED_INGEST` | `true` | Automatic cron-based ingestion (enabled by default) |
+| `INGEST_CRON` | `0 3 * * *` | Cron expression for scheduled ingestion (default: daily at 3 AM UTC) |
+
+### Scheduled Ingestion
+
+The app can automatically refresh data from KKR on a schedule using cron jobs. This is disabled by default.
+
+**To enable:**
+```bash
+ENABLE_SCHEDULED_INGEST=true
+INGEST_CRON=0 3 * * *    # Daily at 3 AM UTC
+```
+
+**Common cron patterns:**
+| Pattern | Description |
+|---------|-------------|
+| `0 3 * * *` | Daily at 3:00 AM |
+| `0 */6 * * *` | Every 6 hours |
+| `0 0 * * 0` | Weekly on Sunday at midnight |
+| `0 0 1 * *` | Monthly on the 1st at midnight |
 
 ## API Documentation
 
@@ -315,6 +335,7 @@ src/
 ├── ingestion/
 │   ├── ingestion.module.ts         # Ingestion feature module
 │   ├── portfolio-ingest.service.ts # Ingestion orchestration
+│   ├── scheduled-ingestion.service.ts # Cron-based scheduled ingestion
 │   ├── ingestion-run.repository.ts # Run tracking repository
 │   ├── kkr-client/                 # KKR API client
 │   │   ├── kkr.client.ts           # HTTP client with retry
