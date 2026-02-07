@@ -53,13 +53,7 @@ export class RelatedLinkDto {
 /**
  * Related links container.
  */
-export class RelatedLinksDto {
-  @ApiPropertyOptional({ type: RelatedLinkDto })
-  linkOne?: RelatedLinkDto;
-
-  @ApiPropertyOptional({ type: RelatedLinkDto })
-  linkTwo?: RelatedLinkDto;
-}
+// RelatedLinksDto class removed - using RelatedLinkDto[] instead
 
 /**
  * Source metadata for data provenance tracking.
@@ -74,7 +68,7 @@ export class SourceMetaDto {
   })
   endpoint: string;
 
-  @ApiProperty({ example: '2026-02-05T22:14:18.961Z' })
+  @ApiProperty({ example: '2026-02-07T16:08:21.096Z' })
   fetchedAt: Date;
 }
 
@@ -176,9 +170,9 @@ export class CompanyResponseDto {
 
   @ApiPropertyOptional({
     description: 'Optional related links (press releases, videos)',
-    type: RelatedLinksDto,
+    type: [RelatedLinkDto],
   })
-  relatedLinks?: RelatedLinksDto;
+  relatedLinks?: RelatedLinkDto[];
 
   @ApiProperty({
     description: 'Source metadata for provenance tracking',
@@ -188,13 +182,13 @@ export class CompanyResponseDto {
 
   @ApiPropertyOptional({
     description: 'Document creation timestamp',
-    example: '2026-02-05T22:14:18.964Z',
+    example: '2026-02-07T16:08:21.104Z',
   })
   createdAt?: Date;
 
   @ApiPropertyOptional({
     description: 'Document last update timestamp',
-    example: '2026-02-05T22:14:18.964Z',
+    example: '2026-02-07T16:08:21.104Z',
   })
   updatedAt?: Date;
 }

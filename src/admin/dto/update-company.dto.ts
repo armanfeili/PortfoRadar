@@ -26,19 +26,7 @@ class RelatedLinkDto {
 /**
  * DTO for related links updates.
  */
-class RelatedLinksDto {
-  @ApiPropertyOptional({ type: RelatedLinkDto })
-  @IsOptional()
-  @ValidateNested()
-  @Type(() => RelatedLinkDto)
-  linkOne?: RelatedLinkDto;
-
-  @ApiPropertyOptional({ type: RelatedLinkDto })
-  @IsOptional()
-  @ValidateNested()
-  @Type(() => RelatedLinkDto)
-  linkTwo?: RelatedLinkDto;
-}
+// RelatedLinksDto class removed - using RelatedLinkDto[] instead
 
 /**
  * DTO for updating a company.
@@ -145,10 +133,10 @@ export class UpdateCompanyDto {
 
   @ApiPropertyOptional({
     description: 'Related links (press releases, videos)',
-    type: RelatedLinksDto,
+    type: [RelatedLinkDto],
   })
   @IsOptional()
-  @ValidateNested()
-  @Type(() => RelatedLinksDto)
-  relatedLinks?: RelatedLinksDto;
+  @ValidateNested({ each: true })
+  @Type(() => RelatedLinkDto)
+  relatedLinks?: RelatedLinkDto[];
 }

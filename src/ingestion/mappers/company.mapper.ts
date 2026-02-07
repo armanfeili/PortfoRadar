@@ -137,25 +137,22 @@ export function mapRawToCompanyDto(
   const contentHash = generateContentHash(raw);
 
   // Build related links if present
-  const relatedLinks =
-    raw.relatedLinkOne || raw.relatedLinkTwo
-      ? {
-          linkOne:
-            raw.relatedLinkOne || raw.relatedLinkOneTitle
-              ? {
-                  url: raw.relatedLinkOne,
-                  title: raw.relatedLinkOneTitle,
-                }
-              : undefined,
-          linkTwo:
-            raw.relatedLinkTwo || raw.relatedLinkTwoTitle
-              ? {
-                  url: raw.relatedLinkTwo,
-                  title: raw.relatedLinkTwoTitle,
-                }
-              : undefined,
-        }
-      : undefined;
+  // Build related links array
+  const relatedLinks: { url?: string; title?: string }[] = [];
+
+  if (raw.relatedLinkOne || raw.relatedLinkOneTitle) {
+    relatedLinks.push({
+      url: raw.relatedLinkOne,
+      title: raw.relatedLinkOneTitle,
+    });
+  }
+
+  if (raw.relatedLinkTwo || raw.relatedLinkTwoTitle) {
+    relatedLinks.push({
+      url: raw.relatedLinkTwo,
+      title: raw.relatedLinkTwoTitle,
+    });
+  }
 
   return {
     companyId,
@@ -175,7 +172,7 @@ export function mapRawToCompanyDto(
     yearOfInvestment: raw.yoi || undefined,
     logoPath: raw.logo || undefined,
     logoUrl: buildLogoUrl(raw.logo),
-    relatedLinks,
+    relatedLinks: relatedLinks.length > 0 ? relatedLinks : undefined,
 
     // Source metadata
     source: {

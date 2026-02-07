@@ -22,10 +22,7 @@ export interface UpsertCompanyDto {
   yearOfInvestment?: string;
   logoPath?: string;
   logoUrl?: string;
-  relatedLinks?: {
-    linkOne?: { url?: string; title?: string };
-    linkTwo?: { url?: string; title?: string };
-  };
+  relatedLinks?: { url?: string; title?: string }[];
   source: {
     listUrl: string;
     endpoint: string;

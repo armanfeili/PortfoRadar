@@ -15,15 +15,7 @@ export class RelatedLink {
   title?: string;
 }
 
-export class RelatedLinks {
-  @ApiPropertyOptional({ type: RelatedLink })
-  @Prop({ type: RelatedLink })
-  linkOne?: RelatedLink;
-
-  @ApiPropertyOptional({ type: RelatedLink })
-  @Prop({ type: RelatedLink })
-  linkTwo?: RelatedLink;
-}
+// RelatedLinks class removed - using RelatedLink[] instead
 
 /**
  * Source metadata for data provenance tracking.
@@ -40,7 +32,7 @@ export class SourceMeta {
   @Prop({ required: true })
   endpoint: string;
 
-  @ApiProperty({ example: '2026-02-05T22:14:18.961Z' })
+  @ApiProperty({ example: '2026-02-07T16:08:21.096Z' })
   @Prop({ required: true })
   fetchedAt: Date;
 }
@@ -179,11 +171,11 @@ export class Company {
 
   /** Optional related links (press releases, videos) */
   @ApiPropertyOptional({
-    description: 'Optional related links',
-    type: RelatedLinks,
+    description: 'Optional related links (press releases, videos)',
+    type: [RelatedLink],
   })
-  @Prop({ type: RelatedLinks })
-  relatedLinks?: RelatedLinks;
+  @Prop({ type: [RelatedLink] })
+  relatedLinks?: RelatedLink[];
 
   /** Source metadata for provenance tracking */
   @ApiProperty({
