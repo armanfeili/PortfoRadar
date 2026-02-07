@@ -108,7 +108,7 @@ Before submitting, verify ALL of these with the provided commands:
 
 **Goal**: Understand exactly how KKR serves portfolio data before writing any code.
 
-**Status**: ✅ **COMPLETE** — See `docs/source-analysis.md` for full details.
+**Status**: ✅ **COMPLETE** — See `docs/SOURCE_ANALYSIS.md` for full details.
 
 ### Key Findings Summary
 
@@ -156,7 +156,7 @@ interface PortfolioCompany {
 5. **Do NOT store `sortingName`** — it changes based on sort parameter
 
 ### Deliverable
-- [x] Created `docs/source-analysis.md` with full findings
+- [x] Created `docs/SOURCE_ANALYSIS.md` with full findings
 
 ---
 
@@ -1439,7 +1439,7 @@ INGEST_CRON=0 3 * * *    # Daily at 3 AM UTC
 
 | Order | Phase | Priority | Notes |
 |-------|-------|----------|-------|
-| 1 | Phase 0: Source Recon | ✅ Complete | See `docs/source-analysis.md` |
+| 1 | Phase 0: Source Recon | ✅ Complete | See `docs/SOURCE_ANALYSIS.md` |
 | 2 | Phase 1: Repo Setup | 🟡 High | NestJS scaffold + lint |
 | 3 | Phase 2: Config + DB | 🟡 High | Fail-fast config, MongoDB connection |
 | 4 | Phase 3: Data Model | 🟡 High | Schema + deterministic hash key |
@@ -1457,7 +1457,7 @@ INGEST_CRON=0 3 * * *    # Daily at 3 AM UTC
 
 1. **Commit often** with meaningful messages
 2. **Test incrementally** — verify each phase works before moving on
-3. **Phase 0 is done** — reference `docs/source-analysis.md` for all API details
+3. **Phase 0 is done** — reference `docs/SOURCE_ANALYSIS.md` for all API details
 4. **Prioritize working software** over bonus features
 5. **Document as you go** — don't leave README for last
 6. **Use `npx`** over global installs for reproducibility

@@ -352,15 +352,16 @@ src/
     └── verify-data.ts              # Data quality verification
 
 docs/
-├── DEVELOPMENT_PHASES.md           # Implementation roadmap (this file)
-├── source-analysis.md              # KKR API analysis
-├── Code_Challenge.txt              # Challenge requirements
+├── DEVELOPMENT_PHASES.md           # Implementation roadmap
+├── SOURCE_ANALYSIS.md              # KKR API analysis
+├── CODE_CHALLENGE.md               # Challenge requirements
 ├── AI_USAGE.md                     # AI tools usage documentation
-├── CONTAINER_REGISTRY.md           # Docker image pull/run instructions
-├── DEPLOYMENT.md                   # Cloud deployment guide (Railway)
-├── MONGOSH_REFERENCE.md            # MongoDB shell commands reference
-├── SECRETS_MANAGEMENT.md           # Secrets and env var best practices
-└── Prompts.md                      # Development prompts
+├── PROMPTS.md                      # Agent prompt template
+└── Guides/
+    ├── CONTAINER_REGISTRY.md       # Docker image pull/run instructions
+    ├── DEPLOYMENT.md               # Cloud deployment guide (Railway)
+    ├── MONGOSH_REFERENCE.md        # MongoDB shell commands reference
+    └── SECRETS_MANAGEMENT.md       # Secrets and env var best practices
 
 test/
 ├── app.e2e-spec.ts                 # E2E tests

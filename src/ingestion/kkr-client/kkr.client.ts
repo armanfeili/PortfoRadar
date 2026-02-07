@@ -9,7 +9,7 @@ import {
 
 /**
  * Base endpoint for KKR Portfolio API.
- * Discovered in Phase 0 recon (source-analysis.md).
+ * Discovered in Phase 0 recon (SOURCE_ANALYSIS.md).
  */
 const KKR_API_ENDPOINT =
   'https://www.kkr.com/content/kkr/sites/global/en/invest/portfolio/jcr:content/root/main-par/bioportfoliosearch.bioportfoliosearch.json';

@@ -13,7 +13,7 @@ This document describes how AI tools were used during the development of PortfoR
 
 ### Phase 0: Source Reconnaissance
 - **Manual**: Captured HAR files from kkr.com, analyzed network requests, identified API endpoints and pagination behavior
-- **AI-assisted**: Structured the findings into `source-analysis.md`
+- **AI-assisted**: Structured the findings into `SOURCE_ANALYSIS.md`
 
 ### Phase 1: Repository Setup
 - **AI-assisted**: NestJS scaffolding commands, ESLint/Prettier configuration

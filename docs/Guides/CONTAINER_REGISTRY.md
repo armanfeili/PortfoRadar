@@ -36,13 +36,13 @@ curl http://localhost:3000/companies | jq '.total'
 
 ## CI/CD Pipeline
 
-The GitHub Actions workflow (`.github/workflows/ci.yml`) handles:
+GitHub Actions workflows handle automated builds and publishing:
 
-| Stage | Trigger | Action |
-|-------|---------|--------|
-| Build | Push/PR | Lint → Test → Build TypeScript |
-| Docker Build | Push/PR | Build Docker image |
-| Docker Push | Merge to `main` | Push to GHCR with `:latest` + `:sha-XXX` tags |
+| Workflow | Trigger | Action |
+|----------|---------|--------|
+| `ci.yml` | Push/PR to `main` | Lint → Test → Build TypeScript → Build Docker image |
+| `publish.yml` | Tag push (`v*`) | Build and push Docker image to GHCR |
+| `cd.yml` | Merge to `main` | Deploy to Railway |
 
 ### Image Tags
 
@@ -50,6 +50,7 @@ The GitHub Actions workflow (`.github/workflows/ci.yml`) handles:
 |-----|-------------|
 | `latest` | Most recent `main` branch build |
 | `<sha>` | Specific commit (7-char SHA) |
+| `v*` | Version tags (e.g., `v1.0.0`) |
 
 ## Repository Settings (For Forks)
 

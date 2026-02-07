@@ -104,6 +104,9 @@ If `MONGO_URI` appears in any log context, it will show as `[REDACTED]`.
 | `LOG_LEVEL` | No | `info` | Log level (debug/info/warn/error) |
 | `THROTTLE_TTL` | No | `60` | Rate limit window (seconds) |
 | `THROTTLE_LIMIT` | No | `100` | Max requests per window |
+| `ALLOWED_ORIGINS` | No | — | CORS: Comma-separated frontend domains that can call this API. Only needed if you have a separate frontend app. Leave unset for same-origin or to allow all. |
+| `ENABLE_SCHEDULED_INGEST` | No | `true` | Automatic cron-based data ingestion (enabled by default) |
+| `INGEST_CRON` | No | `0 3 * * *` | Cron expression for scheduled ingestion (default: daily at 3 AM UTC) |
 
 ## Validation
 

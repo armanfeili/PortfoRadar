@@ -1,6 +1,6 @@
 /**
  * Type definitions for KKR Portfolio API responses.
- * Based on source-analysis.md (Phase 0 recon).
+ * Based on SOURCE_ANALYSIS.md (Phase 0 recon).
  */
 
 /**

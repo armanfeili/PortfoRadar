@@ -55,6 +55,7 @@ temp/
 # Research files (large binary captures)
 *.har
 docs/research/
+docs/Research/
 
 # Debug files
 *.pem
