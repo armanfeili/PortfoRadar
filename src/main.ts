@@ -44,6 +44,8 @@ async function bootstrap() {
     .setVersion('1.0')
     .addTag('Companies', 'Portfolio company operations')
     .addTag('Stats', 'Aggregated statistics')
+    .addTag('Health', 'System health checks')
+    .addTag('Admin', 'Administrative operations')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
