@@ -20,6 +20,7 @@ import {
 import { AdminApiKeyGuard } from './guards/admin-api-key.guard';
 import { PortfolioIngestService } from '../ingestion/portfolio-ingest.service';
 import { AdminKeyService } from './admin-key.service';
+import { CompaniesRepository } from '../companies/companies.repository';
 import { IngestionResultDto } from './dto/ingestion-result.dto';
 import { CreateAdminKeyDto } from './dto/create-admin-key.dto';
 import { AdminKeyResponseDto } from './dto/admin-key-response.dto';
@@ -39,6 +40,7 @@ export class AdminController {
   constructor(
     private readonly ingestService: PortfolioIngestService,
     private readonly adminKeyService: AdminKeyService,
+    private readonly companiesRepository: CompaniesRepository,
   ) {}
 
   /**
@@ -158,5 +160,59 @@ export class AdminController {
     );
 
     return result;
+  }
+
+  /**
+   * Delete all companies from the database.
+   *
+   * ⚠️ DESTRUCTIVE OPERATION: This permanently removes all company data.
+   * Use with caution. Re-ingestion will be required to restore data.
+   */
+  @Delete('companies')
+  @HttpCode(200)
+  @UseGuards(AdminApiKeyGuard)
+  @ApiOperation({
+    summary: 'Delete all companies',
+    description:
+      'Permanently deletes all company records from the database. ' +
+      'This is a destructive operation — use with caution. ' +
+      'Re-run ingestion via POST /admin/ingest to restore data. ' +
+      'Requires X-Admin-Key header with a valid temporary key.',
+  })
+  @ApiHeader({
+    name: 'X-Admin-Key',
+    description: 'Temporary admin key generated via POST /admin/keys',
+    required: true,
+    example: 'ak_a1b2c3d4e5f6...',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'All companies deleted successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        deleted: { type: 'number', example: 296 },
+        message: {
+          type: 'string',
+          example: 'Successfully deleted 296 companies',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Missing or invalid X-Admin-Key header',
+  })
+  async deleteAllCompanies(): Promise<{ deleted: number; message: string }> {
+    this.logger.warn('Delete all companies triggered via HTTP endpoint');
+
+    const deletedCount = await this.companiesRepository.deleteAll();
+
+    this.logger.log(`Deleted ${deletedCount} companies`);
+
+    return {
+      deleted: deletedCount,
+      message: `Successfully deleted ${deletedCount} companies`,
+    };
   }
 }

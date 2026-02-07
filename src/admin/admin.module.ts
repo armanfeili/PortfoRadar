@@ -5,6 +5,7 @@ import { AdminApiKeyGuard } from './guards/admin-api-key.guard';
 import { AdminKeyService } from './admin-key.service';
 import { AdminKey, AdminKeySchema } from './schemas/admin-key.schema';
 import { IngestionModule } from '../ingestion/ingestion.module';
+import { CompaniesModule } from '../companies/companies.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { IngestionModule } from '../ingestion/ingestion.module';
       { name: AdminKey.name, schema: AdminKeySchema },
     ]),
     IngestionModule,
+    CompaniesModule,
   ],
   controllers: [AdminController],
   providers: [AdminApiKeyGuard, AdminKeyService],

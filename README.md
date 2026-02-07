@@ -8,8 +8,7 @@ A NestJS application that ingests and serves KKR's investment portfolio company 
 
 | Resource | URL |
 |----------|-----|
-| **API** | https://portforadar-production.up.railway.app |
-| **Swagger UI** | https://portforadar-production.up.railway.app/api/docs |
+| **Swagger UI - API** | https://portforadar-production.up.railway.app/api/docs |
 | **Health** | https://portforadar-production.up.railway.app/health |
 
 > **Note**: If the deployed instance shows 0 companies, ingestion may need to be triggered. See [Ingesting Data on Deployed Instance](#ingesting-data-on-deployed-instance).
@@ -139,6 +138,7 @@ Interactive Swagger documentation available at `/api/docs` when running.
 | POST | `/admin/keys` | Generate temporary admin key (public endpoint) |
 | DELETE | `/admin/keys/:keyId` | Revoke a temporary key |
 | POST | `/admin/ingest` | Trigger data ingestion (requires `X-Admin-Key` header) |
+| DELETE | `/admin/companies` | Delete all companies (requires `X-Admin-Key` header) |
 
 ### Temporary Admin Keys
 
@@ -146,7 +146,7 @@ Generate short-lived API keys for admin operations.
 
 **Generate a temporary key (no auth required):**
 ```bash
-curl -X POST https://your-app.railway.app/admin/keys \
+curl -X POST https://portforadar-production.up.railway.app/admin/keys \
   -H "Content-Type: application/json" \
   -d '{"ttlMinutes": 30}'
 ```
@@ -163,7 +163,7 @@ Response (token shown **once only**):
 
 **Use the temp key for admin operations:**
 ```bash
-curl -X POST https://your-app.railway.app/admin/ingest \
+curl -X POST https://portforadar-production.up.railway.app/admin/ingest \
   -H "X-Admin-Key: ak_a1b2c3d4e5f6..."
 ```
 
@@ -186,13 +186,13 @@ The `/admin/ingest` endpoint allows triggering data ingestion without CLI access
 
 **Via curl:**
 ```bash
-curl -X POST https://your-app.railway.app/admin/ingest \
+curl -X POST https://portforadar-production.up.railway.app/admin/ingest \
   -H "X-Admin-Key: your-admin-key-or-ak_xxx"
 ```
 
 **Verify:**
 ```bash
-curl https://your-app.railway.app/companies | jq '.total'
+curl https://portforadar-production.up.railway.app/companies | jq '.total'
 # Should return > 0 after successful ingestion
 ```
 
