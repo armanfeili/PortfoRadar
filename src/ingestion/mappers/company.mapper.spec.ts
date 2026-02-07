@@ -411,8 +411,9 @@ describe('Company Mapper', () => {
       );
 
       expect(dto.relatedLinks).toBeDefined();
-      expect(dto.relatedLinks?.linkOne?.url).toBe('/news/press-release');
-      expect(dto.relatedLinks?.linkOne?.title).toBe('Press Release');
+      expect(dto.relatedLinks).toHaveLength(1);
+      expect(dto.relatedLinks?.[0]?.url).toBe('/news/press-release');
+      expect(dto.relatedLinks?.[0]?.title).toBe('Press Release');
     });
 
     it('should include source metadata', () => {
