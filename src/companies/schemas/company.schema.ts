@@ -6,11 +6,14 @@ import { HydratedDocument } from 'mongoose';
  * Related link structure for press releases, videos, etc.
  */
 export class RelatedLink {
-  @ApiPropertyOptional({ example: 'https://www.kkr.com/news/press-release' })
+  @ApiPropertyOptional({
+    example:
+      'https://www.kkr.com/news/press-release/kkr-invests-in-beacon-pointe',
+  })
   @Prop()
   url?: string;
 
-  @ApiPropertyOptional({ example: 'Press Release' })
+  @ApiPropertyOptional({ example: 'KKR Invests in Beacon Pointe' })
   @Prop()
   title?: string;
 }

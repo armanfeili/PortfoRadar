@@ -12,12 +12,15 @@ import { Type } from 'class-transformer';
  * DTO for related link updates.
  */
 class UpdateRelatedLinkDto {
-  @ApiPropertyOptional({ example: 'https://example.com/press-release' })
+  @ApiPropertyOptional({
+    example:
+      'https://www.kkr.com/news/press-release/kkr-invests-in-beacon-pointe',
+  })
   @IsOptional()
   @IsString()
   url?: string;
 
-  @ApiPropertyOptional({ example: 'Press Release' })
+  @ApiPropertyOptional({ example: 'KKR Invests in Beacon Pointe' })
   @IsOptional()
   @IsString()
   title?: string;

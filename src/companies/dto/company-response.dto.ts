@@ -43,10 +43,13 @@ export class PaginationLinksDto {
  * Related link structure for press releases, videos, etc.
  */
 export class RelatedLinkDto {
-  @ApiPropertyOptional({ example: 'https://www.kkr.com/news/press-release' })
+  @ApiPropertyOptional({
+    example:
+      'https://www.kkr.com/news/press-release/kkr-invests-in-beacon-pointe',
+  })
   url?: string;
 
-  @ApiPropertyOptional({ example: 'Press Release' })
+  @ApiPropertyOptional({ example: 'KKR Invests in Beacon Pointe' })
   title?: string;
 }
 
