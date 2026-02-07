@@ -23,7 +23,7 @@ export class IngestionCountsDto {
 /**
  * Source metadata from the ingestion.
  */
-export class SourceMetaDto {
+export class IngestionSourceMetaDto {
   @ApiProperty({
     example: 296,
     description: 'Total companies reported by source API',
@@ -60,8 +60,8 @@ export class IngestionResultDto {
   @ApiProperty({ type: IngestionCountsDto })
   counts: IngestionCountsDto;
 
-  @ApiProperty({ type: SourceMetaDto })
-  sourceMeta: SourceMetaDto;
+  @ApiProperty({ type: IngestionSourceMetaDto })
+  sourceMeta: IngestionSourceMetaDto;
 
   @ApiProperty({
     example: 12500,

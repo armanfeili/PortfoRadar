@@ -11,7 +11,7 @@ import { Type } from 'class-transformer';
 /**
  * DTO for related link updates.
  */
-class RelatedLinkDto {
+class UpdateRelatedLinkDto {
   @ApiPropertyOptional({ example: 'https://example.com/press-release' })
   @IsOptional()
   @IsString()
@@ -133,10 +133,10 @@ export class UpdateCompanyDto {
 
   @ApiPropertyOptional({
     description: 'Related links (press releases, videos)',
-    type: [RelatedLinkDto],
+    type: [UpdateRelatedLinkDto],
   })
   @IsOptional()
   @ValidateNested({ each: true })
-  @Type(() => RelatedLinkDto)
-  relatedLinks?: RelatedLinkDto[];
+  @Type(() => UpdateRelatedLinkDto)
+  relatedLinks?: UpdateRelatedLinkDto[];
 }
