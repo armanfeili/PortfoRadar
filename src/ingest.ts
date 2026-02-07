@@ -42,7 +42,7 @@ async function bootstrap() {
     console.log(`Complete:        ${result.isComplete ? '✅ YES' : '⚠️  NO'}`);
     console.log('========================================\n');
 
-    // Warn if incomplete
+    // Warn if incomplete - For debugging
     if (!result.isComplete) {
       logger.warn(
         `⚠️  Collected ${result.counts.fetched}/${result.sourceMeta.totalFromSource} companies. ` +
