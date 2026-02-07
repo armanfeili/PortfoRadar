@@ -348,7 +348,6 @@ src/
 │   ├── health.module.ts            # Health module
 │   └── health.controller.ts        # Health check endpoint
 └── scripts/
-    ├── test-upsert.ts              # Upsert verification script
     └── verify-data.ts              # Data quality verification
 
 docs/
@@ -356,7 +355,6 @@ docs/
 ├── SOURCE_ANALYSIS.md              # KKR API analysis
 ├── CODE_CHALLENGE.md               # Challenge requirements
 ├── AI_USAGE.md                     # AI tools usage documentation
-├── PROMPTS.md                      # Agent prompt template
 └── Guides/
     ├── CONTAINER_REGISTRY.md       # Docker image pull/run instructions
     ├── DEPLOYMENT.md               # Cloud deployment guide (Railway)

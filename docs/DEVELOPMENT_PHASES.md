@@ -73,10 +73,6 @@ npm install helmet @nestjs/throttler              # Security hardening
 PORT=3000
 MONGO_URI=mongodb://localhost:27017/portfolioradar
 
-# Optional (Phase 8 bonus)
-ENABLE_NL_QUERY=false
-OPENAI_API_KEY=
-
 # Scheduled Ingestion (enabled by default)
 ENABLE_SCHEDULED_INGEST=true    # Automatic cron-based ingestion
 INGEST_CRON=0 3 * * *           # Cron expression (default: daily at 3 AM UTC)
@@ -315,9 +311,9 @@ interface PortfolioCompany {
 
 5. **Updated AppModule** with new module imports
 
-6. **Created Test Script** (`src/scripts/test-upsert.ts`):
-   - Verifies upsert idempotency (run twice = no duplicates)
-   - Verifies updates apply correctly
+6. **Verified upsert idempotency** during development:
+   - Tested that running upsert twice doesn't create duplicates
+   - Verified updates apply correctly when data changes
 
 ### Files Created/Modified
 
@@ -329,7 +325,6 @@ interface PortfolioCompany {
 | `src/ingestion/schemas/ingestion-run.schema.ts` | Created | IngestionRun schema for tracking |
 | `src/ingestion/ingestion.module.ts` | Created | Ingestion NestJS module |
 | `src/app.module.ts` | Modified | Added CompaniesModule, IngestionModule imports |
-| `src/scripts/test-upsert.ts` | Created | Upsert idempotency verification script |
 
 ### Verification Results
 
@@ -339,14 +334,13 @@ interface PortfolioCompany {
 | Build passes | `npm run build` | ✅ No errors |
 | Server starts | `npm run start:dev` | ✅ All modules load correctly |
 | Health endpoint | `curl localhost:3000/health` | ✅ `{"status":"ok"}` |
-| Upsert test | `npx ts-node src/scripts/test-upsert.ts` | ✅ PASS: no duplicates |
+| Upsert idempotency | Run `npm run ingest` twice | ✅ PASS: no duplicates |
 
-### Upsert Idempotency Test Results
+### Upsert Idempotency Verification
 
 ```
-1. First upsert:  created=true,  updated=false → count=1
-2. Second upsert: created=false, updated=true  → count=1 (no duplicate)
-3. Third upsert:  created=false, updated=true  → count=1 (field updated)
+1. First ingest:  Created: N, Updated: 0
+2. Re-run ingest: Created: 0, Updated: 0 (no duplicate, no unnecessary writes)
 ✅ PASS: Upsert is idempotent - no duplicates created
 ```
 

@@ -88,7 +88,7 @@ All AI-generated code was:
 4. **Integration tested** via Docker Compose end-to-end runs
 
 The developer can explain:
-- Why `name + hq` was chosen as the hash key (collision analysis in `scripts/collision-report.ts`)
+- Why `name + hq` was chosen as the hash key (collision analysis during development)
 - How the accumulation loop handles CDN inconsistency
 - Why `sortingName` from the API is never stored (it changes based on the `sortParameter` query param)
 - How content hash optimization achieves true idempotency (zero unnecessary writes)
