@@ -231,35 +231,55 @@ The `sortingName` field changes based on the `sortParameter` used in the request
 
 ### Unique Identifier Strategy
 
-The API does not provide a unique ID. **Recommended approach:**
+The API does not provide a unique ID. We developed a deterministic hash strategy during reconnaissance.
 
-#### Primary Key: Deterministic Hash (`kkrKey`)
+#### Original Insight: 5-Field Hash
 
-Generate a stable, collision-resistant key:
+Initial recommendation used 5 fields to maximize disambiguation:
 
 ```typescript
+// ORIGINAL RECOMMENDATION (Phase 0)
+const normalized = [
+  company.name.toLowerCase().trim(),
+  company.yoi,
+  company.hq.toLowerCase().trim(),
+  company.assetClass.toLowerCase().trim(),
+  company.industry.toLowerCase().trim()
+].join('|');
+```
+
+**Rationale:** More fields = more collision resistance for edge cases (same name, different entity).
+
+#### Final Implementation: 2-Field Hash (`companyId`)
+
+After analysis, we simplified to only `name + hq`:
+
+```typescript
+// IMPLEMENTED (src/ingestion/mappers/company.mapper.ts)
 import { createHash } from 'crypto';
 
-function generateKkrKey(company: PortfolioCompany): string {
-  const normalized = [
-    company.name.toLowerCase().trim(),
-    company.yoi,
-    company.hq.toLowerCase().trim(),
-    company.assetClass.toLowerCase().trim(),
-    company.industry.toLowerCase().trim()
-  ].join('|');
-  
+function generateCompanyId(name: string, hq: string): string {
+  const normalized = `${name.toLowerCase().trim()}|${hq.toLowerCase().trim()}`;
   return createHash('sha256').update(normalized).digest('hex').substring(0, 32);
 }
 ```
 
-**Why this approach:**
-- Provides idempotency: same input always produces same key (as long as underlying fields stay stable)
-- 32-char hex (128 bits) reduces collision risk to negligible levels
-- Handles disambiguation (same name, different entity differentiated by other fields)
-- MongoDB: create unique index on `kkrKey`
+**Why we simplified:**
+- `name + hq` is already unique in KKR's dataset (verified: 296 unique companies, 296 unique name+hq pairs)
+- Example: "ON*NET Fibra" exists in both Chile and Colombia — distinguished by `hq`
+- Fewer fields = more stable key (asset class or industry changes won't break identity)
+- 32-char hex (128 bits) still provides negligible collision risk
 
-**⚠️ Limitation:** If KKR changes a company's name or other identifying fields, the hash will change. If a stable backend ID (e.g., content fragment path) is discovered later, consider replacing the hash as primary key.
+**Update-Only-If-Changed Optimization:**
+
+In addition to `companyId`, we compute a `contentHash` from all business fields:
+
+```typescript
+// If contentHash matches existing document, skip the write entirely
+contentHash = SHA256(JSON.stringify({name, assetClass, industry, region, ...})).substring(0, 32)
+```
+
+This ensures reruns with no upstream changes result in `Updated: 0` (true idempotency).
 
 #### Secondary: Display Slug
 
@@ -708,42 +728,53 @@ From HTML `data-*` attributes:
 
 ---
 
-## 📋 MongoDB Schema Recommendation
+## 📋 MongoDB Schema (Implemented)
+
+The following schema is implemented in `src/companies/schemas/company.schema.ts`:
 
 ```typescript
 interface PortfolioCompanyDocument {
   _id: ObjectId;
-  kkrKey: string;         // Deterministic hash, 32 hex chars (unique index)
-  slug: string;           // Human-readable URL slug
+  companyId: string;        // Deterministic hash: SHA256(name + hq).substring(0, 32)
+  contentHash: string;      // Hash of business fields for update-only-if-changed
   name: string;
-  sortingName: string;    // Used for alphabetical sorting
-  assetClass: string[];   // Split if comma-separated
+  nameSort: string;         // Lowercase name for sorting
+  assetClassRaw: string;    // Original comma-separated value
+  assetClasses: string[];   // Split array for filtering
   industry: string;
   region: string;
-  description?: string;   // Raw HTML from API
+  descriptionHtml?: string; // Raw HTML from API
   descriptionText?: string; // Stripped of HTML tags
-  hq?: string;
-  website?: string;       // Normalized (add https:// if missing)
-  yearOfInvestment?: number;
-  logoUrl?: string;       // Full URL
+  headquarters?: string;
+  website?: string;         // Normalized (add https:// if missing)
+  yearOfInvestment?: string;
+  logoPath?: string;        // Relative path from API
+  logoUrl?: string;         // Full URL (https://www.kkr.com + logoPath)
   
-  // Optional related links (present on some companies)
-  relatedLinks?: {
-    linkOne?: { url: string; title: string };
-    linkTwo?: { url: string; title: string };
+  // Related links (flexible array structure)
+  relatedLinks?: Array<{
+    url: string;
+    title: string;
+  }>;
+  
+  // Source metadata
+  source: {
+    listUrl: string;
+    endpoint: string;
+    fetchedAt: Date;
   };
   
-  // Metadata
+  // Timestamps (Mongoose automatic)
   createdAt: Date;
   updatedAt: Date;
-  sourceUrl: string;
-  rawData?: object;       // Original API response for debugging
 }
 
-// Indexes
-// - Unique index on `kkrKey`
-// - Index on `sortingName` for alphabetical queries
-// - Index on `assetClass`, `industry`, `region` for filtering
+// Indexes (defined in schema)
+// - Unique index on `companyId`
+// - Index on `nameSort` for alphabetical queries
+// - Multikey index on `assetClasses` for array field filtering
+// - Index on `industry`, `region` for filtering
+// - Compound index on `industry + region`
 ```
 
 ---
@@ -919,15 +950,52 @@ The colon (`:`) is URL-encoded as `%3A`.
 
 ---
 
-## 📝 Next Steps (Phase 1)
+## ✅ Project Status: Complete
 
-1. Initialize NestJS project with TypeScript
-2. Set up MongoDB connection with Mongoose
-3. Create PortfolioCompany schema based on above recommendation
-4. Implement HTTP client service for KKR API
-5. Build scraper service with pagination logic
-6. **Optional:** Implement filter passthrough to leverage server-side filtering
+All phases of the PortfoRadar project have been successfully implemented:
+
+| Phase | Status | Description |
+|-------|--------|-------------|
+| Phase 0 | ✅ Complete | Source Reconnaissance (this document) |
+| Phase 1 | ✅ Complete | Repository & Engineering Baseline |
+| Phase 2 | ✅ Complete | Config Validation + Database + Logging |
+| Phase 3 | ✅ Complete | Data Model (Schemas + Repositories) |
+| Phase 4 | ✅ Complete | Ingestion Service with CDN mitigation |
+| Phase 5 | ✅ Complete | REST API with Swagger documentation |
+| Phase 6 | ✅ Complete | Docker + Docker Compose |
+| Phase 7 | ✅ Complete | Testing (88 tests passing) |
+| Phase 8 | ✅ Complete | Production Polish (Helmet, Throttling, Admin API) |
+
+### Key Achievements
+
+- **296 companies** reliably ingested from KKR's portfolio API
+- **Idempotent upserts** with content-hash optimization (update-only-if-changed)
+- **CDN variability mitigation** via accumulation loop + sequential fetching
+- **REST API** with filtering, pagination, and full-text search
+- **Admin endpoints** with temporary API key authentication
+- **Scheduled ingestion** via cron (configurable, enabled by default)
+- **88 unit tests** passing across 8 test suites
+- **CI/CD pipeline** via GitHub Actions
+- **Deployed to Railway** at https://portforadar-production.up.railway.app
+
+### Verification Commands
+
+```bash
+# Run full ingestion
+npm run ingest
+
+# Verify data integrity
+npm run verify:data
+
+# Run all tests
+npm run test
+
+# Build and start production
+npm run build && npm run start:prod
+```
 
 ---
 
-*Document generated during PHASE 0 - Source Reconnaissance*
+*Document generated during PHASE 0 - Source Reconnaissance*  
+*Updated: 2026-02-08 — Project status: COMPLETE*
+
