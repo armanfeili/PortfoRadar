@@ -8,33 +8,37 @@ on:
     branches:
       - main
       - master
-  workflow_dispatch: # Allow manual trigger
+  workflow_dispatch:
+
+concurrency:
+  group: cd-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   verify-deployment:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
-    
+
     steps:
       - name: Wait for Railway deployment
         run: |
           echo "⏳ Waiting for Railway to deploy (Railway auto-deploys via GitHub integration)..."
-          sleep 30
+          sleep 60
 
       - name: Verify deployment health
         env:
           RAILWAY_URL: ${{ secrets.RAILWAY_URL || 'https://portforadar-production.up.railway.app' }}
         run: |
           echo "🔍 Checking deployment health at $RAILWAY_URL/health"
-          for i in {1..10}; do
+          for i in {1..12}; do
             if curl -f -s "$RAILWAY_URL/health" > /dev/null; then
               echo "✅ Deployment verified - health check passed"
               exit 0
             fi
-            echo "⏳ Attempt $i/10: Health check not ready yet, retrying in 10s..."
-            sleep 10
+            echo "⏳ Attempt $i/12: Health check not ready yet, retrying in 15s..."
+            sleep 15
           done
-          echo "⚠️ Health check failed after 10 attempts"
+          echo "⚠️ Health check failed after 12 attempts"
           echo "Note: Railway auto-deploys via GitHub integration. If deployment fails, check Railway dashboard."
           exit 1
         continue-on-error: true
@@ -42,8 +46,13 @@ jobs:
       - name: Deployment status
         if: always()
         run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            CI_STATUS="⚠️ Skipped (manual trigger)"
+          else
+            CI_STATUS="✅ Passed"
+          fi
           echo "📋 CD Pipeline Summary:"
-          echo "  - CI Status: ✅ Passed"
+          echo "  - CI Status: $CI_STATUS"
           echo "  - Railway Deployment: Triggered via GitHub integration"
           echo "  - Health Check: ${{ job.status }}"
           echo ""
