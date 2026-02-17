@@ -115,6 +115,10 @@ open http://localhost:3000/api/docs
 
 ## Architecture
 
+### Module Architecture
+
+![Module Architecture](docs/diagrams/PortfoRadar.drawio.png)
+
 ### Request Lifecycle
 
 Shows the order in which NestJS processes a single HTTP request through the global layers configured in [`src/main.ts`](src/main.ts).
