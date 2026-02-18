@@ -19,6 +19,27 @@ A NestJS application that ingests and serves KKR's investment portfolio company 
 
 PortfoRadar fetches portfolio company information from KKR's public API, normalizes the data, and stores it in MongoDB. It provides a comprehensive REST API with filtering, pagination, full-text search, and aggregated statistics.
 
+## Table of Contents
+
+- [Live Demo](#-live-demo)
+- [Overview](#overview)
+- [Tech Stack](#tech-stack)
+- [Quick Start](#quick-start)
+- [Architecture](#architecture)
+- [Environment Variables](#environment-variables)
+- [API Documentation](#api-documentation)
+- [Project Structure](#project-structure)
+- [Available Scripts](#available-scripts)
+- [CLI Usage Guide](#cli-usage-guide)
+- [MongoDB Console Commands](#mongodb-console-commands)
+- [How KKR Portfolio Data Is Retrieved](#how-kkr-portfolio-data-is-retrieved)
+- [Data Model & Idempotent Storage](#data-model--idempotent-storage)
+- [Design Decisions](#design-decisions)
+- [Testing](#testing)
+- [CI/CD](#cicd)
+- [What Was Delivered](#what-was-delivered)
+- [Future Work](#future-work)
+- [License](#license)
 
 ## Tech Stack
 
