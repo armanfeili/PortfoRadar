@@ -19,15 +19,6 @@ A NestJS application that ingests and serves KKR's investment portfolio company 
 
 PortfoRadar fetches portfolio company information from KKR's public API, normalizes the data, and stores it in MongoDB. It provides a comprehensive REST API with filtering, pagination, full-text search, and aggregated statistics.
 
-## Features
-
-- **Data Ingestion**: Automated fetching from KKR's portfolio API with field normalization
-- **REST API**: Full CRUD-style endpoints with advanced filtering
-- **Search**: Case-insensitive regex search across company names and descriptions
-- **Pagination**: Offset-based pagination with configurable limits
-- **Statistics**: Aggregated counts by asset class, industry, region, and year
-- **OpenAPI Documentation**: Interactive Swagger UI at `/api`
-- **Health Checks**: Kubernetes-ready health endpoints
 
 ## Tech Stack
 
@@ -145,7 +136,7 @@ Shows the order in which NestJS processes a single HTTP request through the glob
 
 ### Scheduled Ingestion
 
-The app can automatically refresh data from KKR on a schedule using cron jobs. This is disabled by default.
+The app can automatically refresh data from KKR on a schedule using cron jobs. This is enabled by default.
 
 **To enable:**
 ```bash
@@ -559,7 +550,7 @@ The endpoint behaves like a paginated JSON API:
 | `pages` | Total pages (currently 20, fixed 15 items/page) |
 | `results` | Array of company records |
 
-**CDN behavior:** The endpoint is served via CDN. In practice, page responses may vary across edge nodes, occasionally returning incomplete sets when pages are fetched concurrently. Our ingestion handles this with an accumulation loop (see below).
+**CDN behavior:** The endpoint is served via CDN. In practice, page responses may vary across edge nodes, occasionally returning incomplete sets when pages are fetched concurrently. Our ingestion handles this with an **accumulation loop**: if the first fetch pass returns fewer than `sourceTotal` companies, we retry up to 5 times, accumulating unique companies until the complete set is collected.
 
 ## Data Model & Idempotent Storage
 
@@ -579,32 +570,6 @@ companyId = SHA256(name + hq).substring(0, 32)
 - **Safe repeated runs** — idempotent upserts
 - **Minimal write load** — update-only-if-changed via content hash
 
-## Reliability Guarantees (Completeness Reporting)
-
-We verify completeness by comparing accumulated unique companies against the source-reported total. The CLI output includes:
-
-```
-========================================
-        INGESTION SUMMARY
-========================================
-Run ID:          <uuid>
-Status:          COMPLETED
-Duration:        10854ms
-----------------------------------------
-Fetched:         296
-Unique:          296
-Created:         0
-Updated:         0
-Failed:          0
-----------------------------------------
-Source total:    296
-Source pages:    20
-Accum. attempts: 1
-Complete:        ✅ YES
-========================================
-```
-
-**Accumulation loop:** If the first fetch pass returns fewer than `sourceTotal` companies (due to CDN variability), we retry up to 5 times, accumulating unique companies until complete.
 
 ## Design Decisions
 
