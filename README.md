@@ -659,6 +659,100 @@ GitHub Actions workflow runs on push/PR to main:
 
 See [.github/workflows/ci.yml](.github/workflows/ci.yml).
 
+## What Was Delivered
+
+### 1. Cross-Cutting Platform Features
+- **Security headers** — Helmet (XSS, sniffing, HSTS)
+- **Body size limit** — JSON cap against DoS
+- **Env validation** — Zod schema validates all env vars at startup; crashes with clear errors if invalid
+- **Validation** — Global ValidationPipe: whitelist, type transform, structured errors
+- **Error handling** — Global filter → consistent `{ statusCode, error, message, path, timestamp }`
+- **Logging** — Pino JSON logs, request correlation IDs, sensitive field redaction
+- **Rate limiting** — Global ThrottlerGuard, env-configurable TTL + limit
+- **CORS** — Env-driven origin allowlist; restrictive in prod, open in dev
+
+### 2. Swagger/OpenAPI Documentation
+- Interactive UI at `/api/docs` with try-it-out
+- Schemas auto-generated from DTOs
+- Query params, headers, and error shapes fully documented
+- Endpoints grouped by tag (Companies, Stats, Admin, Health)
+
+### 3. Automated Testing + CI Quality Gates
+- 88 unit tests / 8 suites (mapper, controller, service, guard, filter, DTO)
+- E2E tests via Supertest
+- Coverage thresholds enforced in CI (branches ≥ 30%, lines ≥ 28%)
+
+### 4. Core NestJS Modules
+- **AppModule** — Root composition; wires framework + feature modules, sets global rate-limit guard
+- **DatabaseModule** — Global Mongoose connection from env-driven `MONGO_URI`
+- **HealthModule** — `GET /health` → `{ status: 'ok' }` for probes and deploy checks
+
+### 5. Companies Public Read API
+- `GET /companies` — Paginated, filterable (`assetClass`, `industry`, `region`, `yoi`), searchable (`?q=`), sortable
+- `GET /companies/:id` — Single company by hash ID
+- `GET /stats` — Aggregated counts by asset class, industry, region, year
+- HATEOAS `_links` in responses; regex-escaped search; content-hash upserts
+- **Data provenance** — Each company stores `source` metadata (endpoint URL, `fetchedAt` timestamp)
+- **Related links** — Stored as a flexible array (`RelatedLink[]`) for press releases, videos, etc.
+- **Compound indexes** — `{ industry, region }` compound index + multikey index on `assetClasses[]`
+
+### 6. KKR Ingestion Pipeline
+- **KkrClient** — Undici + p-retry, fetches paginated KKR JSON
+- **KKR API type definitions** — Typed interfaces (`KkrRawCompany`, `KkrApiResponse`, `KkrPaginationMeta`)
+- **Mapper** — Normalizes HTML, URLs, asset class arrays
+- **Idempotent upserts** — SHA256 company ID + content hash; skips unchanged docs
+- **Accumulation loop** — Retries up to 5× to handle CDN inconsistency
+- **Run tracking** — Persists status, counts, duration per ingestion run
+- **Cron scheduling** — Daily at 3 AM UTC (configurable, enabled by default)
+- **CLI** — `npm run ingest` (run ingestion) / `npm run verify:data` (sanity checks)
+
+### 7. Admin Operational API
+- `POST /admin/keys` — Generate temp `ak_` token (shown once, TTL 5–1440 min)
+- `DELETE /admin/keys/:keyId` — Revoke key
+- `POST /admin/ingest` — Trigger ingestion (protected)
+- `PATCH /admin/companies/:id` — Partial update (protected)
+- `DELETE /admin/companies` — Bulk delete (protected)
+- Auth via custom guard: validates hashed token, checks expiry/revocation, tracks usage
+
+### 8. Delivery Pipeline
+- **Docker** — Multi-stage Alpine build, non-root user, prod-only deps
+- **Compose** — App + MongoDB 7, health check polling, persistent volume
+- **GHCR** — Images tagged `latest`, semver, and commit SHA
+- **CI** — Push/PR → lint → test + coverage → build → Docker push
+- **CD** — After CI success, polls `/health` to verify Railway deployment
+- **Pre-commit** — Husky + lint-staged: Prettier + ESLint on staged `.ts` files
+
+### 9. Documentation
+- `SOURCE_ANALYSIS.md` — KKR API reverse-engineering analysis (HAR capture, endpoint behavior, CDN quirks)
+- `DEVELOPMENT_PHASES.md` — 9-phase implementation roadmap
+- `AI_USAGE.md` — AI tool usage transparency per development phase
+- `DEPLOYMENT.md` — Railway cloud deployment guide
+- `CONTAINER_REGISTRY.md` — GHCR pull/run instructions
+- `MONGOSH_REFERENCE.md` — MongoDB shell commands reference
+- `SECRETS_MANAGEMENT.md` — Env var and secrets best practices
+- `.env.example` — Fully documented template with all config options and common cron patterns
+- 3 architecture diagrams (simple, full, request lifecycle) + editable `.drawio` source
+
+## Future Work
+
+### Frontend
+- Dashboard UI (React/Next.js) for browsing companies, visualizing stats with charts, and interactive search
+
+### Security & Auth
+- JWT / OAuth2 token-based authentication for multi-user access
+- Role-based access control (RBAC) — separate read-only, editor, and admin roles
+- Redis-backed distributed rate limiting for multi-instance deployments
+
+### Other Improvements
+- MongoDB text index to replace regex search for better performance at scale
+- Multi-source ingestion — extend beyond KKR to other PE/VC firms
+- Redis caching layer for hot queries (stats, popular filters)
+- OpenTelemetry tracing and APM integration
+- Kubernetes manifests (Helm/Kustomize) for cloud-native orchestration
+- Higher test coverage thresholds and integration tests with Testcontainers
+- Change history / audit log to track diffs between ingestion runs
+- Data freshness alerts when scheduled ingestion fails
+
 ## License
 
 MIT License — see [LICENSE](LICENSE) for details.
