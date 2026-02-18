@@ -115,9 +115,13 @@ open http://localhost:3000/api/docs
 
 ## Architecture
 
-### Module Architecture
+### Simple Architecture
 
-![Module Architecture](docs/diagrams/PortfoRadar.drawio.png)
+![Simple Architecture](docs/diagrams/PortfoRadar-simple-architecture.png)
+
+### Full Architecture
+
+![Full Architecture](docs/diagrams/PortfoRadar-full-architecture.drawio.png)
 
 ### Request Lifecycle
 

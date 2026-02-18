@@ -1,0 +1,412 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36" version="29.4.0" pages="2">
+  <diagram name="Page-1" id="VmPuKnhjz4bvoXmtz6oK">
+    <mxGraphModel dx="2965" dy="2890" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-221" edge="1" parent="1" source="gkXhjx2DJ5AsU6fgRjxx-81" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.25;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="gkXhjx2DJ5AsU6fgRjxx-127">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-223" edge="1" parent="1" source="gkXhjx2DJ5AsU6fgRjxx-81" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="gkXhjx2DJ5AsU6fgRjxx-116">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-279" edge="1" parent="1" source="gkXhjx2DJ5AsU6fgRjxx-81" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="gkXhjx2DJ5AsU6fgRjxx-263">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-81" parent="1" style="swimlane;whiteSpace=wrap;html=1;fillColor=#EBDFBC;strokeColor=default;startSize=60;" value="AppModule&lt;div&gt;&lt;span style=&quot;font-weight: normal;&quot;&gt;Root composition (wires framework + feature modules), sets global guard&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="540" width="390" x="570" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-82" parent="gkXhjx2DJ5AsU6fgRjxx-81" style="swimlane;whiteSpace=wrap;html=1;fillColor=#EBDFBC;strokeColor=default;startSize=35;" value="&lt;div style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;Imports (framework/global)&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="130" width="370" x="10" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-83" parent="gkXhjx2DJ5AsU6fgRjxx-82" style="rounded=1;whiteSpace=wrap;html=1;align=left;fillColor=#FFF2CC;strokeColor=#9673a6;fontStyle=1;arcSize=9;spacing=6;" value="&lt;div style=&quot;&quot;&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- Config: loads env vars globally + validates them at startup&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- Schedule: enables cron/background scheduling features&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- Throttler: config-driven API rate limiting&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- Logger: structured logging (pino) + log redaction&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="75" width="350" x="10" y="45" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-91" parent="gkXhjx2DJ5AsU6fgRjxx-81" style="swimlane;whiteSpace=wrap;html=1;fillColor=#EBDFBC;strokeColor=default;startSize=30;" value="&lt;div style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;div&gt;Imports (project modules)&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="130" width="370" x="10" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-92" parent="gkXhjx2DJ5AsU6fgRjxx-91" style="rounded=1;whiteSpace=wrap;html=1;align=left;fillColor=#FFF2CC;strokeColor=#9673a6;fontStyle=1;arcSize=9;spacing=6;" value="&lt;div style=&quot;&quot;&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- Database: Mongo/Mongoose connection&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- Health: health probe endpoint&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- Companies: public read APIs for companies + stats&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- Ingestion: fetch + normalize + persist KKR portfolio data&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- Admin: operational/admin endpoints + API key protection&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="350" x="10" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-95" parent="gkXhjx2DJ5AsU6fgRjxx-81" style="swimlane;whiteSpace=wrap;html=1;fillColor=#EBDFBC;strokeColor=default;startSize=30;" value="&lt;div style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;Providers&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="370" x="10" y="350" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-96" parent="gkXhjx2DJ5AsU6fgRjxx-95" style="rounded=1;whiteSpace=wrap;html=1;align=left;fillColor=#FFF2CC;strokeColor=#9673a6;fontStyle=1;arcSize=9;spacing=6;" value="&lt;div style=&quot;&quot;&gt;&lt;div&gt;&lt;span style=&quot;font-weight: normal;&quot;&gt;- Global Guard: rate limit applied to all endpoints&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="30" width="350" x="10" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-111" parent="gkXhjx2DJ5AsU6fgRjxx-81" style="swimlane;whiteSpace=wrap;html=1;fillColor=#EBDFBC;strokeColor=default;startSize=30;" value="&lt;div style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;Other features&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="370" x="10" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-112" parent="gkXhjx2DJ5AsU6fgRjxx-111" style="rounded=1;whiteSpace=wrap;html=1;align=left;fillColor=#FFF2CC;strokeColor=#9673a6;fontStyle=1;arcSize=9;spacing=6;" value="&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;Controllers: - None&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;Exports: - None&lt;/span&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="350" x="10" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-116" parent="1" style="swimlane;whiteSpace=wrap;html=1;fillColor=#CFE0F0;strokeColor=default;startSize=60;" value="DatabaseModule (Mongo connection)&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;Creates the single global Mongoose connection using config (Mongo URI + options)&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="360" width="315" x="120" y="735" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-117" parent="gkXhjx2DJ5AsU6fgRjxx-116" style="swimlane;whiteSpace=wrap;html=1;fillColor=#CFE0F0;strokeColor=default;startSize=35;" value="&lt;div style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;Imports&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="300" x="10" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-118" parent="gkXhjx2DJ5AsU6fgRjxx-117" style="rounded=1;whiteSpace=wrap;html=1;align=left;fillColor=#E6F2FF;strokeColor=#9673a6;fontStyle=1;arcSize=9;spacing=6;" value="&lt;div style=&quot;&quot;&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- Mongoose connection factory (async, env-driven)&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="35" width="280" x="10" y="45" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-121" parent="gkXhjx2DJ5AsU6fgRjxx-116" style="swimlane;whiteSpace=wrap;html=1;fillColor=#CFE0F0;strokeColor=default;startSize=30;" value="&lt;div style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;Providers&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="300" x="10" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-122" parent="gkXhjx2DJ5AsU6fgRjxx-121" style="rounded=1;whiteSpace=wrap;html=1;align=left;fillColor=#E6F2FF;strokeColor=#9673a6;fontStyle=1;arcSize=9;spacing=6;" value="&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- None&lt;/span&gt;&lt;span style=&quot;background-color: transparent; font-weight: 400;&quot;&gt;&amp;nbsp;explicit (created by MongooseModule)&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="30" width="280" x="10" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-123" parent="gkXhjx2DJ5AsU6fgRjxx-116" style="swimlane;whiteSpace=wrap;html=1;fillColor=#CFE0F0;strokeColor=default;startSize=30;" value="&lt;div style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;Other features&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="300" x="10" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-124" parent="gkXhjx2DJ5AsU6fgRjxx-123" style="rounded=1;whiteSpace=wrap;html=1;align=left;fillColor=#E6F2FF;strokeColor=#9673a6;fontStyle=1;arcSize=9;spacing=6;" value="&lt;div style=&quot;&quot;&gt;&lt;div&gt;&lt;span style=&quot;font-weight: normal;&quot;&gt;Controllers: - None&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: normal;&quot;&gt;Exports: - None&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="280" x="10" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-222" edge="1" parent="1" source="gkXhjx2DJ5AsU6fgRjxx-127" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" target="gkXhjx2DJ5AsU6fgRjxx-81">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-127" parent="1" style="swimlane;whiteSpace=wrap;html=1;fillColor=#DDE7C8;strokeColor=default;startSize=60;" value="HealthModule (Health probe)&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;Provides a simple &quot;is the server up?&quot; endpoint for deployments/monitoring.&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="280" width="315" x="120" y="445" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-128" parent="gkXhjx2DJ5AsU6fgRjxx-127" style="swimlane;whiteSpace=wrap;html=1;fillColor=#DDE7C8;strokeColor=default;startSize=35;" value="&lt;div style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;Other features&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="110" width="300" x="10" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-129" parent="gkXhjx2DJ5AsU6fgRjxx-128" style="rounded=1;whiteSpace=wrap;html=1;align=left;fillColor=#F2FFE0;strokeColor=#9673a6;fontStyle=1;arcSize=9;spacing=6;" value="&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;font-weight: normal;&quot;&gt;Imports: - None&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;font-weight: normal;&quot;&gt;Providers: - None&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;font-weight: normal;&quot;&gt;Exports: - None&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="55" width="280" x="10" y="45" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-132" parent="gkXhjx2DJ5AsU6fgRjxx-127" style="swimlane;whiteSpace=wrap;html=1;fillColor=#DDE7C8;strokeColor=default;startSize=30;" value="&lt;div style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;Controllers&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="300" x="10" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-133" parent="gkXhjx2DJ5AsU6fgRjxx-132" style="rounded=1;whiteSpace=wrap;html=1;align=left;fillColor=#F2FFE0;strokeColor=#9673a6;fontStyle=1;arcSize=9;spacing=6;" value="&lt;div style=&quot;&quot;&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- HealthController: returns an OK status payload&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="30" width="280" x="10" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-233" edge="1" parent="1" source="gkXhjx2DJ5AsU6fgRjxx-136" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="gkXhjx2DJ5AsU6fgRjxx-81">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="325" y="1130" />
+              <mxPoint x="765" y="1130" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-136" parent="1" style="swimlane;whiteSpace=wrap;html=1;fillColor=#EAD6D6;strokeColor=default;startSize=60;" value="CompaniesModule (Public read API)&lt;div&gt;&lt;span style=&quot;font-weight: normal;&quot;&gt;Exposes read-only endpoints for listing companies, filtering/searching, and getting aggregated stats.&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="820" width="410" x="120" y="1170" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-137" parent="gkXhjx2DJ5AsU6fgRjxx-136" style="swimlane;whiteSpace=wrap;html=1;fillColor=#EAD6D6;strokeColor=default;startSize=35;" value="&lt;div style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;Imports&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="390" x="10" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-138" parent="gkXhjx2DJ5AsU6fgRjxx-137" style="rounded=1;whiteSpace=wrap;html=1;align=left;fillColor=#FFE9E9;strokeColor=#9673a6;fontStyle=1;arcSize=9;spacing=6;" value="&lt;div style=&quot;&quot;&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- Company model registration (Mongoose schema/model binding)&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="35" width="370" x="10" y="45" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-139" parent="gkXhjx2DJ5AsU6fgRjxx-136" style="swimlane;whiteSpace=wrap;html=1;fillColor=#EAD6D6;strokeColor=default;startSize=30;" value="&lt;div style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;Providers&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="190" width="390" x="10" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-140" parent="gkXhjx2DJ5AsU6fgRjxx-139" style="rounded=1;whiteSpace=wrap;html=1;align=left;fillColor=#FFE9E9;strokeColor=#9673a6;fontStyle=1;arcSize=7;spacing=6;" value="&lt;div style=&quot;&quot;&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- CompaniesService: business logic (pagination, filter interpretation, link building)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- CompaniesRepository: Mongo queries + aggregations (lean/select, safe search regex, bulk upsert helpers)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;Note:&lt;/div&gt;&lt;div&gt;&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- Content-hash-based change detection on upsert (skip write if data unchanged)&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- Regex injection protection (escapes search input)&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="140" width="370" x="10" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-141" parent="gkXhjx2DJ5AsU6fgRjxx-136" style="swimlane;whiteSpace=wrap;html=1;fillColor=#EAD6D6;strokeColor=default;startSize=30;" value="&lt;div style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;Controllers&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="390" x="10" y="370" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-142" parent="gkXhjx2DJ5AsU6fgRjxx-141" style="rounded=1;whiteSpace=wrap;html=1;align=left;fillColor=#FFE9E9;strokeColor=#9673a6;fontStyle=1;arcSize=9;spacing=6;" value="&lt;div style=&quot;&quot;&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- CompaniesController: list + get-by-id endpoints&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- StatsController: aggregated statistics endpoint&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="370" x="10" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-156" parent="gkXhjx2DJ5AsU6fgRjxx-136" style="swimlane;whiteSpace=wrap;html=1;fillColor=#EAD6D6;strokeColor=default;startSize=30;" value="&lt;div style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;DTOs&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="130" width="390" x="10" y="470" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-157" parent="gkXhjx2DJ5AsU6fgRjxx-156" style="rounded=1;whiteSpace=wrap;html=1;align=left;fillColor=#FFE9E9;strokeColor=#9673a6;fontStyle=1;arcSize=9;spacing=6;" value="&lt;div style=&quot;&quot;&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- QueryCompaniesDto: validated query params (filters, pagination)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- CompanyResponseDto: documented company response shape&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- StatsResponseDto: documented stats response shape&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- ErrorResponseDto: documented standardized error shape&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="370" x="10" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-296" parent="gkXhjx2DJ5AsU6fgRjxx-136" style="swimlane;whiteSpace=wrap;html=1;fillColor=#EAD6D6;strokeColor=default;startSize=30;" value="&lt;div style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;Schemas&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="100" width="390" x="10" y="610" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-297" parent="gkXhjx2DJ5AsU6fgRjxx-296" style="rounded=1;whiteSpace=wrap;html=1;align=left;fillColor=#FFE9E9;strokeColor=#9673a6;fontStyle=1;arcSize=9;spacing=6;" value="&lt;div style=&quot;&quot;&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- Company schema (company.schema.ts): Mongoose schema defining the&lt;/span&gt;&lt;span style=&quot;font-weight: 400; background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&amp;nbsp;document shape, indexes (unique on companyId), and field types&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="50" width="370" x="10" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-143" parent="gkXhjx2DJ5AsU6fgRjxx-296" style="swimlane;whiteSpace=wrap;html=1;fillColor=#EAD6D6;strokeColor=default;startSize=30;" value="&lt;div style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;Exports&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="390" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-144" parent="gkXhjx2DJ5AsU6fgRjxx-143" style="rounded=1;whiteSpace=wrap;html=1;align=left;fillColor=#FFE9E9;strokeColor=#9673a6;fontStyle=1;arcSize=9;spacing=6;" value="&lt;div style=&quot;&quot;&gt;&lt;div&gt;&lt;span style=&quot;font-weight: normal;&quot;&gt;- Repository + Service (so other modules can reuse them)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: normal;&quot;&gt;- Model bindings (so other modules can inject the model)&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="370" x="10" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-231" edge="1" parent="1" source="gkXhjx2DJ5AsU6fgRjxx-159" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="gkXhjx2DJ5AsU6fgRjxx-81">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="805" y="1130" />
+              <mxPoint x="765" y="1130" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-159" parent="1" style="swimlane;whiteSpace=wrap;html=1;fillColor=#E0DDEF;strokeColor=default;startSize=60;" value="&lt;div&gt;IngestionModule (KKR ingestion + scheduling)&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: normal;&quot;&gt;Fetches portfolio data from KKR&#39;s JSON endpoint, normalizes it, upserts into Mongo, and records ingestion runs; can also run on a schedule.&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="690" width="480" x="600" y="1170" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-160" parent="gkXhjx2DJ5AsU6fgRjxx-159" style="swimlane;whiteSpace=wrap;html=1;fillColor=#E0DDEF;strokeColor=default;startSize=35;" value="&lt;div style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;Imports&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="460" x="10" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-161" parent="gkXhjx2DJ5AsU6fgRjxx-160" style="rounded=1;whiteSpace=wrap;html=1;align=left;fillColor=#F3F0FF;strokeColor=#9673a6;fontStyle=1;arcSize=9;spacing=6;" value="&lt;div style=&quot;&quot;&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- IngestionRun model registration (for run tracking)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- CompaniesModule (so it can upsert companies)&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="35" width="440" x="10" y="45" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-162" parent="gkXhjx2DJ5AsU6fgRjxx-159" style="swimlane;whiteSpace=wrap;html=1;fillColor=#E0DDEF;strokeColor=default;startSize=30;" value="&lt;div style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;Providers&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="220" width="460" x="10" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-163" parent="gkXhjx2DJ5AsU6fgRjxx-162" style="rounded=1;whiteSpace=wrap;html=1;align=left;fillColor=#F3F0FF;strokeColor=#9673a6;fontStyle=1;arcSize=4;spacing=6;" value="&lt;div style=&quot;&quot;&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- KkrClient: external HTTP client wrapper to fetch paginated KKR data&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- PortfolioIngestService: orchestrates the ingestion pipeline (fetch -&amp;gt; map -&amp;gt; upsert -&amp;gt; run report)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- IngestionRunRepository: persists run metadata/results&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- ScheduledIngestionService: registers cron job(s) to run ingestion automatically&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- Mapper utilities: convert raw KKR payload into your internal company shape&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;Note:&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- Accumulation loop (retries up to 5× to handle CDN inconsistency)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- Keep-alive HTTP agent + sequential page fetching with delays (reduces CDN edge switching)&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="170" width="440" x="10" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-164" parent="gkXhjx2DJ5AsU6fgRjxx-159" style="swimlane;whiteSpace=wrap;html=1;fillColor=#E0DDEF;strokeColor=default;startSize=30;" value="&lt;div style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;Controllers&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="460" x="10" y="400" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-165" parent="gkXhjx2DJ5AsU6fgRjxx-164" style="rounded=1;whiteSpace=wrap;html=1;align=left;fillColor=#F3F0FF;strokeColor=#9673a6;fontStyle=1;arcSize=9;spacing=6;" value="&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- None (internal module; used by admin endpoints, cron, and scripts)&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="30" width="440" x="10" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-166" parent="gkXhjx2DJ5AsU6fgRjxx-159" style="swimlane;whiteSpace=wrap;html=1;fillColor=#E0DDEF;strokeColor=default;startSize=30;" value="&lt;div style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;Exports&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="460" x="10" y="590" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-167" parent="gkXhjx2DJ5AsU6fgRjxx-166" style="rounded=1;whiteSpace=wrap;html=1;align=left;fillColor=#F3F0FF;strokeColor=#9673a6;fontStyle=1;arcSize=9;spacing=6;" value="&lt;div style=&quot;&quot;&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- PortfolioIngestService (so admin/scripts can trigger ingestion)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- IngestionRunRepository (so other modules can read run history)&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="440" x="10" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-299" parent="gkXhjx2DJ5AsU6fgRjxx-159" style="swimlane;whiteSpace=wrap;html=1;fillColor=#E0DDEF;strokeColor=default;startSize=30;" value="&lt;div style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;Schemas&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="460" x="10" y="490" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-300" parent="gkXhjx2DJ5AsU6fgRjxx-299" style="rounded=1;whiteSpace=wrap;html=1;align=left;fillColor=#F3F0FF;strokeColor=#9673a6;fontStyle=1;arcSize=9;spacing=6;" value="&lt;div style=&quot;&quot;&gt;&lt;div&gt;&lt;span style=&quot;font-weight: normal;&quot;&gt;- IngestionRun schema (ingestion-run.schema.ts): tracks each ingestion&amp;nbsp;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;run (status, counts, errors, source metadata, timestamps)&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="440" x="10" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-230" edge="1" parent="1" source="gkXhjx2DJ5AsU6fgRjxx-170" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="gkXhjx2DJ5AsU6fgRjxx-81">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1315" y="1130" />
+              <mxPoint x="765" y="1130" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-170" parent="1" style="swimlane;whiteSpace=wrap;html=1;fillColor=#D7ECE9;strokeColor=default;startSize=60;" value="AdminModule (Operational/admin API)&lt;div&gt;&lt;span style=&quot;font-weight: normal;&quot;&gt;Provides protected endpoints to trigger ingestion and manage operational actions; uses temporary API keys for access control.&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="810" width="460" x="1140" y="1170" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-171" parent="gkXhjx2DJ5AsU6fgRjxx-170" style="swimlane;whiteSpace=wrap;html=1;fillColor=#D7ECE9;strokeColor=default;startSize=35;" value="&lt;div style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;Imports&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="110" width="440" x="10" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-172" parent="gkXhjx2DJ5AsU6fgRjxx-171" style="rounded=1;whiteSpace=wrap;html=1;align=left;fillColor=#EAFFFB;strokeColor=#9673a6;fontStyle=1;arcSize=9;spacing=6;" value="&lt;div style=&quot;&quot;&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- AdminKey model registration (store hashed keys + expiry/revocation state)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- IngestionModule (trigger ingestion from admin endpoint)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- CompaniesModule (patch/delete company data from admin endpoint)&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="55" width="420" x="10" y="45" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-173" parent="gkXhjx2DJ5AsU6fgRjxx-170" style="swimlane;whiteSpace=wrap;html=1;fillColor=#D7ECE9;strokeColor=default;startSize=30;" value="&lt;div style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;Providers&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="120" width="440" x="10" y="190" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-174" parent="gkXhjx2DJ5AsU6fgRjxx-173" style="rounded=1;whiteSpace=wrap;html=1;align=left;fillColor=#EAFFFB;strokeColor=#9673a6;fontStyle=1;arcSize=6;spacing=6;" value="&lt;div style=&quot;&quot;&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- AdminApiKeyGuard:&amp;nbsp;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;enforces X-Admin-Key authentication on protected admin routes&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- AdminKeyService:&amp;nbsp;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;creates/validates/revokes keys + updates usage metadata&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="420" x="10" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-175" parent="gkXhjx2DJ5AsU6fgRjxx-170" style="swimlane;whiteSpace=wrap;html=1;fillColor=#D7ECE9;strokeColor=default;startSize=30;" value="&lt;div style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;Controllers&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="150" width="440" x="10" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-176" parent="gkXhjx2DJ5AsU6fgRjxx-175" style="rounded=1;whiteSpace=wrap;html=1;align=left;fillColor=#EAFFFB;strokeColor=#9673a6;fontStyle=1;arcSize=9;spacing=6;" value="&lt;div style=&quot;&quot;&gt;&lt;div&gt;&lt;span style=&quot;font-weight: normal;&quot;&gt;- AdminController:&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- POST /admin/keys (create temporary key; token shown once)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- DELETE /admin/keys/:keyId (revoke key)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- POST /admin/ingest (protected; triggers ingestion)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- PATCH /admin/companies/:companyId (protected; partial update)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- DELETE /admin/companies (protected; wipe all companies)&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="100" width="420" x="10" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-177" parent="gkXhjx2DJ5AsU6fgRjxx-170" style="swimlane;whiteSpace=wrap;html=1;fillColor=#D7ECE9;strokeColor=default;startSize=30;" value="&lt;div style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;Exports&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="440" x="10" y="710" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-178" parent="gkXhjx2DJ5AsU6fgRjxx-177" style="rounded=1;whiteSpace=wrap;html=1;align=left;fillColor=#EAFFFB;strokeColor=#9673a6;fontStyle=1;arcSize=9;spacing=6;" value="&lt;div style=&quot;&quot;&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- AdminKeyService (so other parts can validate keys if needed)&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="420" x="10" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-303" parent="gkXhjx2DJ5AsU6fgRjxx-170" style="swimlane;whiteSpace=wrap;html=1;fillColor=#D7ECE9;strokeColor=default;startSize=30;" value="&lt;div style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;Schemas&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="440" x="10" y="610" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-304" parent="gkXhjx2DJ5AsU6fgRjxx-303" style="rounded=1;whiteSpace=wrap;html=1;align=left;fillColor=#EAFFFB;strokeColor=#9673a6;fontStyle=1;arcSize=9;spacing=6;" value="&lt;div style=&quot;&quot;&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- AdminKey schema (admin-key.schema.ts): stores hashed tokens with&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;font-weight: 400; background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;TTL index for auto-expiry, revocation timestamp, usage tracking&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="420" x="10" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-179" parent="gkXhjx2DJ5AsU6fgRjxx-170" style="swimlane;whiteSpace=wrap;html=1;fillColor=#D7ECE9;strokeColor=default;startSize=30;" value="&lt;div style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;DTOs&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="120" width="440" x="10" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-180" parent="gkXhjx2DJ5AsU6fgRjxx-179" style="rounded=1;whiteSpace=wrap;html=1;align=left;fillColor=#EAFFFB;strokeColor=#9673a6;fontStyle=1;arcSize=9;spacing=6;" value="&lt;div style=&quot;&quot;&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- CreateAdminKeyDto: validates key creation inputs (ttl, createdBy)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- AdminKeyResponseDto: documented key creation response&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- UpdateCompanyDto: validated patch payload for company updates&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- IngestionResultDto: documented ingestion result summary&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="420" x="10" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-282" edge="1" parent="1" source="gkXhjx2DJ5AsU6fgRjxx-181" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="gkXhjx2DJ5AsU6fgRjxx-81">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-181" parent="1" style="swimlane;whiteSpace=wrap;html=1;fillColor=#E0E0E0;strokeColor=default;startSize=60;" value="&lt;div&gt;CROSS-CUTTING (Global app behavior)&lt;/div&gt;" vertex="1">
+          <mxGeometry height="460" width="1480" x="120" y="-30" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-184" parent="gkXhjx2DJ5AsU6fgRjxx-181" style="swimlane;whiteSpace=wrap;html=1;fillColor=#E0E0E0;strokeColor=default;startSize=30;" value="&lt;div style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;div&gt;Validation&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="720" x="10" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-185" parent="gkXhjx2DJ5AsU6fgRjxx-184" style="rounded=1;whiteSpace=wrap;html=1;align=left;fillColor=#F3F3F3;strokeColor=#9673a6;fontStyle=1;arcSize=6;spacing=6;" value="&lt;div style=&quot;&quot;&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- Global ValidationPipe enforces DTO allowlist, rejects unknown fields, and transforms types&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="30" width="700" x="10" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-186" parent="gkXhjx2DJ5AsU6fgRjxx-181" style="swimlane;whiteSpace=wrap;html=1;fillColor=#E0E0E0;strokeColor=default;startSize=30;" value="&lt;div style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;div&gt;Middleware&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="730" x="740" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-187" parent="gkXhjx2DJ5AsU6fgRjxx-186" style="rounded=1;whiteSpace=wrap;html=1;align=left;fillColor=#F3F3F3;strokeColor=#9673a6;fontStyle=1;arcSize=9;spacing=6;" value="&lt;div style=&quot;&quot;&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- Security&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;background-color: transparent; font-weight: 400;&quot;&gt;HTTP&lt;/span&gt;&lt;span style=&quot;font-weight: 400; background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&amp;nbsp;headers (helmet)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- JSON body size limit (basic DoS protection)&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="710" x="10" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-190" parent="gkXhjx2DJ5AsU6fgRjxx-181" style="swimlane;whiteSpace=wrap;html=1;fillColor=#E0E0E0;strokeColor=default;startSize=30;" value="&lt;div style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;div&gt;API docs&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="720" x="10" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-191" parent="gkXhjx2DJ5AsU6fgRjxx-190" style="rounded=1;whiteSpace=wrap;html=1;align=left;fillColor=#F3F3F3;strokeColor=#9673a6;fontStyle=1;arcSize=9;spacing=6;" value="&lt;div style=&quot;&quot;&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- Swagger/OpenAPI setup (interactive docs + schemas)&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="30" width="700" x="10" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-239" parent="gkXhjx2DJ5AsU6fgRjxx-181" style="swimlane;whiteSpace=wrap;html=1;fillColor=#E0E0E0;strokeColor=default;startSize=30;" value="&lt;div style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;div&gt;CORS&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="730" x="740" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-240" parent="gkXhjx2DJ5AsU6fgRjxx-239" style="rounded=1;whiteSpace=wrap;html=1;align=left;fillColor=#F3F3F3;strokeColor=#9673a6;fontStyle=1;arcSize=9;spacing=6;" value="&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- Environment-driven origin allowlist (ALLOWED_ORIGINS).&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;font-weight: 400; background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;In production, restricts to listed domains; in development, allows all (*).&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="30" width="710" x="10" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-252" parent="gkXhjx2DJ5AsU6fgRjxx-181" style="swimlane;whiteSpace=wrap;html=1;fillColor=#E0E0E0;strokeColor=default;startSize=30;" value="&lt;div style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;Config validation&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="730" x="740" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-253" parent="gkXhjx2DJ5AsU6fgRjxx-252" style="rounded=1;whiteSpace=wrap;html=1;align=left;fillColor=#F3F3F3;strokeColor=#9673a6;fontStyle=1;arcSize=9;spacing=6;" value="&lt;div style=&quot;&quot;&gt;&lt;div&gt;&lt;span style=&quot;font-weight: normal;&quot;&gt;Zod schema (&lt;/span&gt;&lt;span style=&quot;font-weight: normal; background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;env.validation.ts&lt;/span&gt;&lt;span style=&quot;font-weight: normal; background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;) - validates all env vars at startup, crashes with clear errors if invalid.&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="30" width="710" x="10" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-280" parent="gkXhjx2DJ5AsU6fgRjxx-181" style="swimlane;whiteSpace=wrap;html=1;fillColor=#E0E0E0;strokeColor=default;startSize=30;" value="&lt;div style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;Exception handling&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="720" x="10" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-281" parent="gkXhjx2DJ5AsU6fgRjxx-280" style="rounded=1;whiteSpace=wrap;html=1;align=left;fillColor=#F3F3F3;strokeColor=#9673a6;fontStyle=1;arcSize=6;spacing=6;" value="&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- Global exception filter formats HttpExceptions into a consistent error payload&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="700" x="10" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-307" parent="gkXhjx2DJ5AsU6fgRjxx-181" style="swimlane;whiteSpace=wrap;html=1;fillColor=#E0E0E0;strokeColor=default;startSize=30;" value="&lt;div style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;Testing&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="100" width="720" x="10" y="350" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-308" parent="gkXhjx2DJ5AsU6fgRjxx-307" style="rounded=1;whiteSpace=wrap;html=1;align=left;fillColor=#F3F3F3;strokeColor=#9673a6;fontStyle=1;arcSize=9;spacing=6;" value="&lt;div style=&quot;&quot;&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- Jest unit tests (88 tests): mappers, services, controllers,&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;font-weight: 400; background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;guards, filters, DTOs&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- E2E tests (supertest): full HTTP request cycle&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- Coverage thresholds enforced in CI&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="50" width="700" x="10" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-309" parent="gkXhjx2DJ5AsU6fgRjxx-181" style="swimlane;whiteSpace=wrap;html=1;fillColor=#E0E0E0;strokeColor=default;startSize=30;" value="&lt;div style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;Logging &amp;amp; Rate Limitting&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="100" width="730" x="740" y="350" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-310" parent="gkXhjx2DJ5AsU6fgRjxx-309" style="rounded=1;whiteSpace=wrap;html=1;align=left;fillColor=#F3F3F3;strokeColor=#9673a6;fontStyle=1;arcSize=9;spacing=6;" value="&lt;div style=&quot;&quot;&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400; background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;- Logging:&lt;/span&gt;&lt;span style=&quot;font-weight: 400; background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&amp;nbsp;Structured JSON logging (Pino) with request correlation IDs&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- Sensitive fields auto-redacted (authorization headers, MONGO_URI)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- Rate Limiting:&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;font-weight: 400; background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Global ThrottlerGuard applied to all endpoints (configurable TTL + limit via env)&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="50" width="710" x="10" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-256" parent="1" style="swimlane;whiteSpace=wrap;html=1;fillColor=#EADFCF;strokeColor=default;startSize=50;" value="Standalone Scripts (no HTTP server)&lt;div&gt;&lt;span style=&quot;font-weight: normal;&quot;&gt;Simpler alternative for hitting API and CI/CD pipeline&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="270" width="480" x="600" y="1880" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-257" parent="gkXhjx2DJ5AsU6fgRjxx-256" style="swimlane;whiteSpace=wrap;html=1;fillColor=#EADFCF;strokeColor=default;startSize=35;" value="&lt;div style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;CLI ingestion&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="100" width="460" x="10" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-258" parent="gkXhjx2DJ5AsU6fgRjxx-257" style="rounded=1;whiteSpace=wrap;html=1;align=left;fillColor=#FFF1E6;strokeColor=#9673a6;fontStyle=1;arcSize=9;spacing=6;" value="&lt;div style=&quot;&quot;&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- “ingest” script bootstraps the Nest application context and runs a full ingestion (prints a run summary, exits non-zero on failure)&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="45" width="440" x="10" y="45" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-259" parent="gkXhjx2DJ5AsU6fgRjxx-256" style="swimlane;whiteSpace=wrap;html=1;fillColor=#EADFCF;strokeColor=default;startSize=30;" value="&lt;div style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;div&gt;Data verification&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="460" x="10" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-260" parent="gkXhjx2DJ5AsU6fgRjxx-259" style="rounded=1;whiteSpace=wrap;html=1;align=left;fillColor=#FFF1E6;strokeColor=#9673a6;fontStyle=1;arcSize=9;spacing=6;" value="&lt;div style=&quot;&quot;&gt;&lt;div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: normal;&quot;&gt;- “verify:data” script bootstraps the app context and runs sanity checks (counts, last run metadata, basic distributions)&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="440" x="10" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-263" parent="1" style="swimlane;whiteSpace=wrap;html=1;fillColor=#EADFE9;strokeColor=default;startSize=60;" value="DELIVERY&lt;div&gt;&lt;span style=&quot;font-weight: normal;&quot;&gt;Docker, GitHub, CI/CD&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="630" width="510" x="1090" y="455" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-264" parent="gkXhjx2DJ5AsU6fgRjxx-263" style="swimlane;whiteSpace=wrap;html=1;fillColor=#EADFE9;strokeColor=default;startSize=35;" value="&lt;div style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;Docker&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="110" width="490" x="10" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-265" parent="gkXhjx2DJ5AsU6fgRjxx-264" style="rounded=1;whiteSpace=wrap;html=1;align=left;fillColor=#F6F6F9;strokeColor=#9673a6;fontStyle=1;arcSize=9;spacing=6;" value="&lt;div style=&quot;&quot;&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- Multi-stage build: build stage (node:20-alpine + npm ci + compile) →&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;&amp;nbsp; production stage (prod deps only, non-root user, ~slim image)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- Docker Compose: app + MongoDB + healthcheck (/health polling, 30s interval)&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="55" width="470" x="10" y="45" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-266" parent="gkXhjx2DJ5AsU6fgRjxx-263" style="swimlane;whiteSpace=wrap;html=1;fillColor=#EADFE9;strokeColor=default;startSize=30;" value="&lt;div style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;div&gt;Container Registry (GHCR)&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="100" width="490" x="10" y="190" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-267" parent="gkXhjx2DJ5AsU6fgRjxx-266" style="rounded=1;whiteSpace=wrap;html=1;align=left;fillColor=#F6F6F9;strokeColor=#9673a6;fontStyle=1;arcSize=9;spacing=6;" value="&lt;div style=&quot;&quot;&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- Images pushed to ghcr.io/armanfeili/portforadar&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- Tags: latest (main branch), semver (v1.0.0, v1.0, v1), and commit SHA&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- Pull + run standalone without cloning the repo&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="50" width="470" x="10" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-268" parent="gkXhjx2DJ5AsU6fgRjxx-263" style="swimlane;whiteSpace=wrap;html=1;fillColor=#EADFE9;strokeColor=default;startSize=30;" value="&lt;div style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;div&gt;CI (GitHub Actions - ci.yml)&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="100" width="490" x="10" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-269" parent="gkXhjx2DJ5AsU6fgRjxx-268" style="rounded=1;whiteSpace=wrap;html=1;align=left;fillColor=#F6F6F9;strokeColor=#9673a6;fontStyle=1;arcSize=9;spacing=6;" value="&lt;div style=&quot;&quot;&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- Trigger: push/PR to main, or version tags (v*)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- Pipeline: install → lint → test with coverage → build → Docker build + push to GHCR&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- Concurrency: cancels duplicate runs on same ref&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="50" width="470" x="10" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-270" parent="gkXhjx2DJ5AsU6fgRjxx-263" style="swimlane;whiteSpace=wrap;html=1;fillColor=#EADFE9;strokeColor=default;startSize=30;" value="&lt;div style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;div&gt;CD (GitHub Actions — cd.yml)&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="100" width="492.5" x="7.5" y="410" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-271" parent="gkXhjx2DJ5AsU6fgRjxx-270" style="rounded=1;whiteSpace=wrap;html=1;align=left;fillColor=#F6F6F9;strokeColor=#9673a6;fontStyle=1;arcSize=9;spacing=6;" value="&lt;div style=&quot;&quot;&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- Trigger: runs after CI succeeds on main (or manual dispatch)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- Railway auto-deploys via GitHub integration&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- Verification: polls /health up to 12× (15s apart) to confirm deployment is live&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="50" width="470" x="10" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-272" parent="gkXhjx2DJ5AsU6fgRjxx-263" style="swimlane;whiteSpace=wrap;html=1;fillColor=#EADFE9;strokeColor=default;startSize=30;" value="&lt;div style=&quot;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;div&gt;Pre-commit (Husky + lint-staged)&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="100" width="492.5" x="7.5" y="520" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-273" parent="gkXhjx2DJ5AsU6fgRjxx-272" style="rounded=1;whiteSpace=wrap;html=1;align=left;fillColor=#F6F6F9;strokeColor=#9673a6;fontStyle=1;arcSize=9;spacing=6;" value="&lt;div style=&quot;&quot;&gt;&lt;div&gt;&lt;span style=&quot;font-weight: 400;&quot;&gt;- On every commit: runs Prettier + ESLint --fix on staged .ts files&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="50" width="470" x="10" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-275" edge="1" parent="1" source="gkXhjx2DJ5AsU6fgRjxx-143" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;" target="gkXhjx2DJ5AsU6fgRjxx-160">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="570" y="1912" />
+              <mxPoint x="570" y="1308" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-301" edge="1" parent="1" source="gkXhjx2DJ5AsU6fgRjxx-143" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;" target="gkXhjx2DJ5AsU6fgRjxx-171">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="570" y="1958" />
+              <mxPoint x="570" y="2190" />
+              <mxPoint x="1120" y="2190" />
+              <mxPoint x="1120" y="1323" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="gkXhjx2DJ5AsU6fgRjxx-302" edge="1" parent="1" source="gkXhjx2DJ5AsU6fgRjxx-167" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="gkXhjx2DJ5AsU6fgRjxx-171">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="zF-PfBCBh0LUUVd1SawY" name="Page-2">
+    <mxGraphModel dx="1458" dy="367" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="EkPp8YFH-ga4dzptrffU-118" edge="1" parent="1" source="EkPp8YFH-ga4dzptrffU-103" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="EkPp8YFH-ga4dzptrffU-116">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="EkPp8YFH-ga4dzptrffU-119" connectable="0" parent="EkPp8YFH-ga4dzptrffU-118" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="CI" vertex="1">
+          <mxGeometry relative="1" x="-0.1287" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="EkPp8YFH-ga4dzptrffU-122" edge="1" parent="1" source="EkPp8YFH-ga4dzptrffU-103" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="EkPp8YFH-ga4dzptrffU-105">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="EkPp8YFH-ga4dzptrffU-123" edge="1" parent="1" source="EkPp8YFH-ga4dzptrffU-103" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="EkPp8YFH-ga4dzptrffU-104">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="EkPp8YFH-ga4dzptrffU-103" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;" value="&lt;span style=&quot;font-weight: 700;&quot;&gt;AppModule&lt;/span&gt;" vertex="1">
+          <mxGeometry height="40" width="110" x="-570" y="518" as="geometry" />
+        </mxCell>
+        <mxCell id="EkPp8YFH-ga4dzptrffU-104" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F2FFE0;" value="&lt;span style=&quot;font-weight: 700;&quot;&gt;HealthModule&lt;/span&gt;" vertex="1">
+          <mxGeometry height="40" width="110" x="-720" y="453" as="geometry" />
+        </mxCell>
+        <mxCell id="EkPp8YFH-ga4dzptrffU-105" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E6F2FF;" value="&lt;span style=&quot;font-weight: 700;&quot;&gt;DatabaseModule&lt;/span&gt;" vertex="1">
+          <mxGeometry height="40" width="110" x="-720" y="518" as="geometry" />
+        </mxCell>
+        <mxCell id="EkPp8YFH-ga4dzptrffU-124" edge="1" parent="1" source="EkPp8YFH-ga4dzptrffU-106" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="EkPp8YFH-ga4dzptrffU-103">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="EkPp8YFH-ga4dzptrffU-106" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3F3F3;" value="&lt;span style=&quot;font-weight: 700;&quot;&gt;Global app behavior&lt;/span&gt;" vertex="1">
+          <mxGeometry height="40" width="110" x="-570" y="453" as="geometry" />
+        </mxCell>
+        <mxCell id="EkPp8YFH-ga4dzptrffU-114" edge="1" parent="1" source="EkPp8YFH-ga4dzptrffU-108" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.25;entryY=1;entryDx=0;entryDy=0;" target="EkPp8YFH-ga4dzptrffU-103">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="EkPp8YFH-ga4dzptrffU-108" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE9E9;" value="&lt;span style=&quot;font-weight: 700;&quot;&gt;CompaniesModule&lt;/span&gt;" vertex="1">
+          <mxGeometry height="40" width="120" x="-700" y="608" as="geometry" />
+        </mxCell>
+        <mxCell id="EkPp8YFH-ga4dzptrffU-113" edge="1" parent="1" source="EkPp8YFH-ga4dzptrffU-109" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="EkPp8YFH-ga4dzptrffU-103">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="EkPp8YFH-ga4dzptrffU-109" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3F0FF;" value="&lt;span style=&quot;font-weight: 700;&quot;&gt;IngestionModule&lt;/span&gt;" vertex="1">
+          <mxGeometry height="40" width="110" x="-570" y="608" as="geometry" />
+        </mxCell>
+        <mxCell id="EkPp8YFH-ga4dzptrffU-115" edge="1" parent="1" source="EkPp8YFH-ga4dzptrffU-110" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.75;entryY=1;entryDx=0;entryDy=0;" target="EkPp8YFH-ga4dzptrffU-103">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="EkPp8YFH-ga4dzptrffU-110" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EAFFFB;" value="&lt;span style=&quot;font-weight: 700;&quot;&gt;AdminModule&lt;/span&gt;" vertex="1">
+          <mxGeometry height="40" width="110" x="-450" y="608" as="geometry" />
+        </mxCell>
+        <mxCell id="EkPp8YFH-ga4dzptrffU-120" edge="1" parent="1" source="EkPp8YFH-ga4dzptrffU-116" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="EkPp8YFH-ga4dzptrffU-117">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="EkPp8YFH-ga4dzptrffU-121" connectable="0" parent="EkPp8YFH-ga4dzptrffU-120" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="CD" vertex="1">
+          <mxGeometry relative="1" x="-0.189" y="-1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="EkPp8YFH-ga4dzptrffU-116" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EADFE9;" value="&lt;span style=&quot;font-weight: 700;&quot;&gt;GitHub&lt;/span&gt;" vertex="1">
+          <mxGeometry height="40" width="110" x="-410" y="518" as="geometry" />
+        </mxCell>
+        <mxCell id="EkPp8YFH-ga4dzptrffU-117" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EACDE6;" value="&lt;span style=&quot;font-weight: 700;&quot;&gt;Production&lt;/span&gt;" vertex="1">
+          <mxGeometry height="40" width="110" x="-240" y="518" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
