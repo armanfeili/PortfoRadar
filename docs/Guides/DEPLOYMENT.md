@@ -87,7 +87,7 @@ For any Linux VPS (DigitalOcean, AWS EC2, etc.):
 
 1. **Pull the image**:
    ```bash
-   docker pull ghcr.io/armanfeili/portfolioradar:latest
+   docker pull ghcr.io/armanfeili/portforadar:latest
    ```
 
 2. **Run with Docker Compose**:

@@ -1197,13 +1197,13 @@ git commit -m "docs: complete README with setup and usage"
 
 **Completed enhancements**:
 - [x] **Push image to container registry** (GitHub Container Registry):
-  - CI pipeline pushes to `ghcr.io/<owner>/portfolioradar` on merge to `main`
+  - CI pipeline pushes to `ghcr.io/<owner>/portforadar` on merge to `main`
   - Tags: `:latest` (default branch) and `:<sha>` (commit hash)
 - [x] **Docker image build/push added to CI pipeline** (`.github/workflows/ci.yml`):
   - Uses `docker/build-push-action@v5` with GHCR login
   - Only pushes on `main` branch (not PRs)
   - Includes Docker layer caching for faster builds
-- [x] **Documentation**: See [docs/CONTAINER_REGISTRY.md](CONTAINER_REGISTRY.md) for pull/run instructions
+- [x] **Documentation**: See [docs/Guides/CONTAINER_REGISTRY.md](Guides/CONTAINER_REGISTRY.md) for pull/run instructions
 
 ---
 

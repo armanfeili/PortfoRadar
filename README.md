@@ -50,7 +50,7 @@ The fastest way to get running:
 
 ```bash
 # Clone and start
-git clone <repository-url> && cd PortfoRadar
+git clone https://github.com/armanfeili/PortfoRadar && cd PortfoRadar
 docker compose up --build
 
 # In another terminal, ingest data
@@ -66,25 +66,25 @@ Pull the pre-built image from GitHub Container Registry:
 
 ```bash
 # Pull latest image
-docker pull ghcr.io/armanfeili/portfolioradar:latest
+docker pull ghcr.io/armanfeili/portforadar:latest
 
 # Start MongoDB
 docker run -d --name mongo -p 27017:27017 mongo:7
 
 # Run the app
-docker run -d --name portfolioradar \
+docker run -d --name portforadar \
   -p 3000:3000 \
   -e MONGO_URI=mongodb://host.docker.internal:27017/portfolioradar \
-  ghcr.io/armanfeili/portfolioradar:latest
+  ghcr.io/armanfeili/portforadar:latest
 
 # Ingest data
-docker exec portfolioradar node dist/ingest.js
+docker exec portforadar node dist/ingest.js
 
 # Verify
 curl http://localhost:3000/companies | jq '.total'
 ```
 
-> See [docs/CONTAINER_REGISTRY.md](docs/CONTAINER_REGISTRY.md) for more details.
+> See [docs/Guides/CONTAINER_REGISTRY.md](docs/Guides/CONTAINER_REGISTRY.md) for more details.
 
 ### Option C: Local Development
 
