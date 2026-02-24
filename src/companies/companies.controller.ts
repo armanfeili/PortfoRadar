@@ -45,6 +45,8 @@ export class CompaniesController {
     type: ErrorResponseDto,
   })
   async findAll(
+    // Tells Nest to take all the query parameters from the URL
+    // and validate them against the QueryCompaniesDto class
     @Query() query: QueryCompaniesDto,
   ): Promise<PaginatedCompaniesResponseDto> {
     return this.companiesService.findAll(query);
@@ -89,10 +91,13 @@ export class CompaniesController {
     const company = await this.companiesService.findByCompanyId(companyId);
 
     if (!company) {
+      // global http-exception.filter.ts will catch this exception
+      // and return a standard JSON error response.
       throw new NotFoundException(`Company with id '${companyId}' not found`);
     }
 
-    // Cast to DTO (Mongoose lean() returns plain objects)
+    // double assertion: company here has a very complex Mongoose-specific type, causing TS errors.
+    // So, we cast it to unknown first, and then to CompanyResponseDto.
     return company as unknown as CompanyResponseDto;
   }
 }
@@ -124,6 +129,7 @@ export class StatsController {
     description: 'Internal server error',
     type: ErrorResponseDto,
   })
+  // The function returns a Promise with the type of StatsResponseDto
   async getStats(): Promise<StatsResponseDto> {
     return this.companiesService.getStats();
   }

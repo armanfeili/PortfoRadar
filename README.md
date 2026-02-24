@@ -339,22 +339,29 @@ src/
 ├── admin/
 │   ├── admin.module.ts             # Admin feature module
 │   ├── admin.controller.ts         # Admin endpoints (keys, ingest, delete)
-│   ├── admin-key.service.ts        # Temporary key generation/validation
-│   ├── dto/                        # Admin DTOs
+│   ├── admin.controller.spec.ts
+│   ├── admin-key.service.ts         # Temporary key generation/validation
+│   ├── admin-key.service.spec.ts
+│   ├── dto/                         # Admin DTOs (+ *.spec.ts)
 │   ├── guards/
-│   │   └── admin-api-key.guard.ts  # Temporary key authentication guard
+│   │   ├── admin-api-key.guard.ts   # Temporary key authentication guard
+│   │   └── admin-api-key.guard.spec.ts
 │   └── schemas/
 │       └── admin-key.schema.ts     # Admin key schema with TTL
 ├── common/
 │   └── filters/
-│       └── http-exception.filter.ts # Global exception filter
+│       ├── http-exception.filter.ts # Global exception filter
+│       └── http-exception.filter.spec.ts
 ├── config/
 │   └── env.validation.ts           # Zod environment validation
 ├── companies/
 │   ├── companies.module.ts         # Companies feature module
 │   ├── companies.controller.ts     # REST endpoints (companies + stats)
+│   ├── companies.controller.spec.ts
 │   ├── companies.service.ts        # Business logic
-│   ├── companies.repository.ts     # MongoDB operations
+│   ├── companies.service.spec.ts
+│   ├── companies.repository.ts    # MongoDB operations
+│   ├── companies.repository.spec.ts
 │   ├── dto/                        # Data transfer objects
 │   └── schemas/
 │       └── company.schema.ts       # Mongoose schema
@@ -362,19 +369,25 @@ src/
 │   └── database.module.ts          # MongoDB connection module
 ├── ingestion/
 │   ├── ingestion.module.ts         # Ingestion feature module
-│   ├── portfolio-ingest.service.ts # Ingestion orchestration
+│   ├── portfolio-ingest.service.ts  # Ingestion orchestration
+│   ├── portfolio-ingest.service.spec.ts
 │   ├── scheduled-ingestion.service.ts # Cron-based scheduled ingestion
-│   ├── ingestion-run.repository.ts # Run tracking repository
+│   ├── scheduled-ingestion.service.spec.ts
+│   ├── ingestion-run.repository.ts  # Run tracking repository
+│   ├── ingestion-run.repository.spec.ts
 │   ├── kkr-client/                 # KKR API client
-│   │   ├── kkr.client.ts           # HTTP client with retry
-│   │   └── kkr-api.types.ts        # API type definitions
+│   │   ├── kkr.client.ts            # HTTP client with retry
+│   │   ├── kkr.client.spec.ts
+│   │   └── kkr-api.types.ts         # API type definitions
 │   ├── mappers/
-│   │   └── company.mapper.ts       # Raw → DTO transformation
+│   │   ├── company.mapper.ts        # Raw → DTO transformation
+│   │   └── company.mapper.spec.ts
 │   └── schemas/
 │       └── ingestion-run.schema.ts # Run tracking schema
 ├── health/
 │   ├── health.module.ts            # Health module
-│   └── health.controller.ts        # Health check endpoint
+│   ├── health.controller.ts        # Health check endpoint
+│   └── health.controller.spec.ts
 └── scripts/
     └── verify-data.ts              # Data quality verification
 
@@ -617,33 +630,43 @@ Structured JSON logging via Pino for production observability. Request correlati
 # Unit tests
 npm run test
 
-# Unit tests with coverage
+# Unit tests with coverage (enforces thresholds: branches ≥ 30%, lines ≥ 28%)
 npm run test:cov
 
 # E2E tests (requires MongoDB)
 npm run test:e2e
 ```
 
-**Test Suites (88 tests total):**
+**Test Suites (171 tests across 16 suites):**
 - `company.mapper.spec.ts` — Company mapper transformations (29 tests)
 - `companies.controller.spec.ts` — REST endpoint tests
 - `companies.service.spec.ts` — Business logic tests
+- `companies.repository.spec.ts` — MongoDB operations (upsert, find, count, etc.)
+- `admin.controller.spec.ts` — Admin endpoints (keys, ingest, delete, update)
 - `admin-key.service.spec.ts` — Admin key generation/validation (9 tests)
 - `admin-api-key.guard.spec.ts` — Authentication guard tests
+- `create-admin-key.dto.spec.ts` — CreateAdminKeyDto validation
+- `update-company.dto.spec.ts` — UpdateCompanyDto validation
 - `health.controller.spec.ts` — Health check tests
 - `http-exception.filter.spec.ts` — Error handling tests
 - `query-companies.dto.spec.ts` — DTO validation tests
+- `portfolio-ingest.service.spec.ts` — Ingestion orchestration
+- `scheduled-ingestion.service.spec.ts` — Cron-based ingestion
+- `kkr.client.spec.ts` — KKR API HTTP client
+- `ingestion-run.repository.spec.ts` — Ingestion run tracking
 
 ## CI/CD
 
-GitHub Actions workflow runs on push/PR to main:
-1. Install dependencies
-2. Run linter
-3. Run unit tests
-4. Build TypeScript
-5. Build Docker image
+GitHub Actions workflow runs on push/PR to `main` and `master`:
+1. **Checkout** — Clone repository
+2. **Setup Node.js 20** — With npm cache
+3. **Install dependencies** — `npm ci`
+4. **Lint** — `npm run lint` (ESLint)
+5. **Test with coverage** — `npm run test:cov` (enforces coverage thresholds)
+6. **Build** — `npm run build`
+7. **Docker build** — Build and push to GHCR (on non-PR events)
 
-See [.github/workflows/ci.yml](.github/workflows/ci.yml).
+All steps must pass for CI to succeed. See [.github/workflows/ci.yml](.github/workflows/ci.yml).
 
 ## What Was Delivered
 
@@ -664,7 +687,7 @@ See [.github/workflows/ci.yml](.github/workflows/ci.yml).
 - Endpoints grouped by tag (Companies, Stats, Admin, Health)
 
 ### 3. Automated Testing + CI Quality Gates
-- 88 unit tests / 8 suites (mapper, controller, service, guard, filter, DTO)
+- 171 unit tests / 16 suites (mapper, controller, service, repository, guard, filter, DTO, ingestion)
 - E2E tests via Supertest
 - Coverage thresholds enforced in CI (branches ≥ 30%, lines ≥ 28%)
 

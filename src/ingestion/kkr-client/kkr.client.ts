@@ -3,8 +3,10 @@ import { request, Agent } from 'undici';
 import * as pRetry from 'p-retry';
 import {
   KkrApiResponse,
-  KkrPaginationMeta,
   KkrRawCompany,
+  KkrClientConfig,
+  PageFetchResult,
+  AllPagesFetchResult,
 } from './kkr-api.types';
 
 /**
@@ -19,22 +21,6 @@ const KKR_API_ENDPOINT =
  */
 export const KKR_PORTFOLIO_URL = 'https://www.kkr.com/invest/portfolio';
 
-/**
- * Configuration for the KKR client.
- */
-interface KkrClientConfig {
-  /** Request timeout in milliseconds */
-  timeoutMs: number;
-  /** Maximum retry attempts per page */
-  maxRetries: number;
-  /** Delay between sequential page fetches (ms) */
-  pageDelayMs: number;
-  /** Maximum accumulation attempts to collect all companies */
-  maxAccumulationAttempts: number;
-  /** Delay between accumulation attempts (ms) */
-  accumulationDelayMs: number;
-}
-
 const DEFAULT_CONFIG: KkrClientConfig = {
   timeoutMs: 30_000, // 30 seconds
   maxRetries: 3,
@@ -42,25 +28,6 @@ const DEFAULT_CONFIG: KkrClientConfig = {
   maxAccumulationAttempts: 5, // Try up to 5 times to collect all companies
   accumulationDelayMs: 500, // 500ms between accumulation attempts
 };
-
-/**
- * Result of fetching a single page.
- */
-export interface PageFetchResult {
-  companies: KkrRawCompany[];
-  pagination: KkrPaginationMeta;
-}
-
-/**
- * Result of fetching all pages.
- */
-export interface AllPagesFetchResult {
-  companies: KkrRawCompany[];
-  totalHits: number;
-  totalPages: number;
-  fetchedPages: number;
-  accumulationAttempts: number;
-}
 
 /**
  * HTTP client for the KKR Portfolio API.
@@ -183,6 +150,10 @@ export class KkrClient {
     this.logger.log('Starting to fetch all portfolio pages...');
 
     // Accumulator: keyed by normalized name (stable across fetches)
+    // Map is a dictionary (hash table) that stores data in key-value pairs.
+    // <string> is the type of the Key, <KkrRawCompany> is the type of the Value.
+    // A Map ensures that reading, writing, and checking for duplicates takes the same amount of time.
+    // If we would use a simple array, we would have to iterate through the array to check for duplicates, which would take O(n) time.
     const accumulated = new Map<string, KkrRawCompany>();
     let totalHits = 0;
     let totalPages = 0;

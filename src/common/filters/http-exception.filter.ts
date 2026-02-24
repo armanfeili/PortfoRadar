@@ -45,7 +45,7 @@ export interface ErrorResponse {
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost): void {
-    const ctx = host.switchToHttp();
+    const ctx = host.switchToHttp(); // Access the execution context as HTTP, it returns an object that allows you to switch between different execution contexts (HTTP, RPC, GraphQL, etc.)
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
     const status = exception.getStatus();

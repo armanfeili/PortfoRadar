@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 
 /**
+ * Mongoose Sub-Schema (Embedded Document)
  * Ingestion counts tracking created/updated/failed records.
  */
 export class IngestionCounts {
@@ -19,6 +20,7 @@ export class IngestionCounts {
 }
 
 /**
+ * Mongoose Sub-Schema (Embedded Document)
  * Source metadata for tracking API response details.
  */
 export class IngestionSourceMeta {
@@ -47,9 +49,12 @@ export class IngestionSourceMeta {
   scopeNote?: string;
 }
 
+// HydratedDocument is a generic type that represents a Mongoose document with its methods and properties.
+// Merging our custom IngestionRun shape with Mongoose's built-in document methods
 export type IngestionRunDocument = HydratedDocument<IngestionRun>;
 
 /**
+ * Mongoose Main Schema (Document)
  * IngestionRun schema tracks each data ingestion execution.
  *
  * Useful for:

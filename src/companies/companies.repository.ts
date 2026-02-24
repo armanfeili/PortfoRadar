@@ -80,7 +80,7 @@ export interface PaginatedResult<T> {
 @Injectable()
 export class CompaniesRepository {
   constructor(
-    @InjectModel(Company.name)
+    @InjectModel(Company.name) // injects the Company model into the repository.
     private readonly companyModel: Model<CompanyDocument>,
   ) {}
 
@@ -180,13 +180,13 @@ export class CompaniesRepository {
     const [items, total] = await Promise.all([
       this.companyModel
         .find(query)
-        .select('-_id -__v')
+        .select('-_id -__v') // Tells MongoDB not to return its internal ID strings.
         .sort({ [sortBy]: sortOrder === 'asc' ? 1 : -1 })
         .skip(skip)
         .limit(limit)
-        .lean<Company[]>()
-        .exec(),
-      this.companyModel.countDocuments(query).exec(),
+        .lean<Company[]>() // Converts the documents to plain JavaScript objects.
+        .exec(), // Executes the query.
+      this.companyModel.countDocuments(query).exec(), // Counts the number of documents that match the query.
     ]);
 
     return {
@@ -220,9 +220,9 @@ export class CompaniesRepository {
     const pipeline: PipelineStage[] =
       field === 'assetClasses'
         ? [
-            { $unwind: `$${field}` },
-            { $group: { _id: `$${field}`, count: { $sum: 1 } } },
-            { $sort: { count: -1 } },
+            { $unwind: `$${field}` }, // for assetClasses, we unwind the array to count each asset class separately.
+            { $group: { _id: `$${field}`, count: { $sum: 1 } } }, // groups documents by the asset class and counts the number of documents in each group.
+            { $sort: { count: -1 } }, // sorts the results in descending order of count.
           ]
         : [
             { $group: { _id: `$${field}`, count: { $sum: 1 } } },
@@ -230,7 +230,7 @@ export class CompaniesRepository {
           ];
 
     const results = await this.companyModel
-      .aggregate<{ _id: string; count: number }>(pipeline)
+      .aggregate<{ _id: string; count: number }>(pipeline) // Executing the aggregation pipeline.
       .exec();
 
     const counts: Record<string, number> = {};
@@ -258,11 +258,12 @@ export class CompaniesRepository {
    */
   async updateByCompanyId(
     companyId: string,
-    updates: Partial<Omit<Company, 'companyId' | 'source'>>,
+    updates: Partial<Omit<Company, 'companyId' | 'source'>>, // only updating the fields that are provided, and we are not updating the companyId or source fields.
   ): Promise<Company | null> {
     // If name is being updated, also update nameSort
     const updateData: Record<string, unknown> = { ...updates };
     if (updates.name) {
+      // If name is being updated, also update nameSort
       updateData.nameSort = updates.name.toLowerCase();
     }
 

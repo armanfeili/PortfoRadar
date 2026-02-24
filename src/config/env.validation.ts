@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod'; // For environment variable validation
 
 /**
  * Zod schema for environment variables.
@@ -31,6 +31,7 @@ export const envSchema = z.object({
   INGEST_CRON: z.string().default('0 3 * * *'), // Default: daily at 3 AM UTC
 });
 
+// Instead of writing an interface manually, we use z.infer to generate it from the schema
 export type EnvConfig = z.infer<typeof envSchema>;
 
 /**

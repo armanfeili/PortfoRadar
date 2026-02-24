@@ -5,6 +5,7 @@ import { CompaniesService } from './companies.service';
 
 describe('CompaniesController', () => {
   let controller: CompaniesController;
+  // jest.Mocked<> will wrap the CompaniesService class, making it a mock class.
   let service: jest.Mocked<CompaniesService>;
 
   const mockCompany = {
@@ -28,6 +29,12 @@ describe('CompaniesController', () => {
 
   beforeEach(async () => {
     const mockService = {
+      // jest.fn() creates mock functions for findAll, findByCompanyId, and getStats
+      // to test only the controller, not the real service or repository code.
+      // jest.fn() has a memory and remembers:
+      // - how many times it was called
+      // - what arguments were passed to it
+      // - what it returned
       findAll: jest.fn(),
       findByCompanyId: jest.fn(),
       getStats: jest.fn(),
@@ -35,7 +42,7 @@ describe('CompaniesController', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [CompaniesController, StatsController],
-      providers: [{ provide: CompaniesService, useValue: mockService }],
+      providers: [{ provide: CompaniesService, useValue: mockService }], // replace the real service with the mock service
     }).compile();
 
     controller = module.get<CompaniesController>(CompaniesController);
@@ -62,6 +69,7 @@ describe('CompaniesController', () => {
       };
       service.findAll.mockResolvedValue(paginatedResult as any);
 
+      // immediately return a Promise that resolves to paginatedResult.
       const result = await controller.findAll({ page: 1, limit: 20 });
 
       expect(result.items).toHaveLength(1);
@@ -69,6 +77,7 @@ describe('CompaniesController', () => {
       expect(result._links).toBeDefined();
     });
 
+    // ensure the controller passes the query params in the URL, to the service layer.
     it('should pass query parameters to service', async () => {
       service.findAll.mockResolvedValue({
         items: [],
@@ -108,11 +117,13 @@ describe('CompaniesController', () => {
     it('should throw NotFoundException when company not found', async () => {
       service.findByCompanyId.mockResolvedValue(null);
 
+      // with a bad ID, the resulting Promise will be rejected with a NotFoundException.
       await expect(controller.findOne('nonexistent')).rejects.toThrow(
         NotFoundException,
       );
     });
 
+    // ensure the error message includes the company ID that was not found.
     it('should include company ID in error message', async () => {
       service.findByCompanyId.mockResolvedValue(null);
 
@@ -127,6 +138,8 @@ describe('StatsController', () => {
   let controller: StatsController;
   let service: jest.Mocked<CompaniesService>;
 
+  // we can remove findAll and findByCompanyId as they are not used in the StatsController.
+  // but it is relied on TypeScript configs to allow us.
   beforeEach(async () => {
     const mockService = {
       findAll: jest.fn(),

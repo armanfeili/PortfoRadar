@@ -8,6 +8,8 @@ import { EnvConfig } from '../config/env.validation';
 /**
  * Manages scheduled (cron-based) ingestion of KKR portfolio data.
  *
+ * OnModuleInit allows a class to execute code immediately after NestJS finishes loading all the modules on startup.
+ *
  * Controlled by environment variables:
  * - ENABLE_SCHEDULED_INGEST: 'true' to enable (default), 'false' to disable
  * - INGEST_CRON: Cron expression for schedule (default: '0 3 * * *' = daily at 3 AM UTC)

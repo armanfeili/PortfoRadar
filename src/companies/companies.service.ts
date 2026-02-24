@@ -15,8 +15,10 @@ import {
  * Service layer for company operations.
  * Wraps repository calls with business logic.
  */
-@Injectable()
+@Injectable() // allows this class to be injected into other classes (like Controller) automatically.
 export class CompaniesService {
+  // inject the CompaniesRepository into the service.
+  // private readonly makes it a property of the class and only accessible within the class.
   constructor(private readonly companiesRepository: CompaniesRepository) {}
 
   /**
@@ -29,6 +31,7 @@ export class CompaniesService {
   ): Promise<PaginatedCompaniesResponseDto> {
     const filters: CompanyFilters = {};
 
+    // optional properties
     if (query.assetClass) {
       filters.assetClass = query.assetClass;
     }
@@ -45,19 +48,20 @@ export class CompaniesService {
       filters.search = query.q;
     }
 
+    // required properties
     const page = query.page ?? 1;
     const limit = query.limit ?? 20;
 
     const pagination: PaginationOptions = {
       page,
       limit,
-      sortBy: 'nameSort',
+      sortBy: 'nameSort', // Based on the YAGNI principle ("You Aren't Gonna Need It"), these features are hardcoded for now.
       sortOrder: 'asc',
     };
 
     const result = await this.companiesRepository.findAll(filters, pagination);
 
-    // Build HATEOAS pagination links
+    // Build HATEOAS pagination links (e.g., "next page url", "previous page url")
     const _links = this.buildPaginationLinks(
       query,
       page,
@@ -86,13 +90,16 @@ export class CompaniesService {
     totalPages: number,
   ): PaginationLinksDto {
     // Build base query string from current filters (excluding page/limit)
+    // URLSearchParams is a built-in JavaScript utility for building URL query strings.
     const baseParams = new URLSearchParams();
 
+    // Setting these params, so users won't lose their filters when navigating through pages.
     if (query.assetClass) baseParams.set('assetClass', query.assetClass);
     if (query.industry) baseParams.set('industry', query.industry);
     if (query.region) baseParams.set('region', query.region);
     if (query.q) baseParams.set('q', query.q);
 
+    // buildLink returns a fully formatted URL (e.g., /companies?region=Americas&page=3&limit=20).
     const buildLink = (targetPage: number): string => {
       const params = new URLSearchParams(baseParams);
       // Always include page and limit for consistency
@@ -101,6 +108,7 @@ export class CompaniesService {
       return `/companies?${params.toString()}`;
     };
 
+    // we create links for self, first, prev, next, and last pages.
     return {
       self: buildLink(page),
       first: page !== 1 ? buildLink(1) : undefined,

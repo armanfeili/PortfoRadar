@@ -6,10 +6,11 @@ import { EnvConfig } from '../config/env.validation';
 @Module({
   imports: [
     MongooseModule.forRootAsync({
+      // configService.get will return values matching the EnvConfig type.
       useFactory: (configService: ConfigService<EnvConfig, true>) => ({
         uri: configService.get('MONGO_URI'),
       }),
-      inject: [ConfigService],
+      inject: [ConfigService], // Pass ConfigService to useFactory
     }),
   ],
 })

@@ -8,7 +8,7 @@
  */
 export interface KkrRawCompany {
   name: string;
-  sortingName: string; // ⚠️ Changes based on sortParameter — do NOT store
+  sortingName: string; // ⚠️ Changes based on sortParameter — do not store. Because KKR's backend dynamically generates the field, and it is not a stable identifier.
   logo: string;
   hq: string;
   region: string; // Single string, NOT an array
@@ -47,4 +47,39 @@ export interface KkrPaginationMeta {
   totalPages: number;
   currentPage: number;
   resultsOnPage: number;
+}
+
+/**
+ * Configuration for the KKR client.
+ */
+export interface KkrClientConfig {
+  /** Request timeout in milliseconds */
+  timeoutMs: number;
+  /** Maximum retry attempts per page */
+  maxRetries: number;
+  /** Delay between sequential page fetches (ms) */
+  pageDelayMs: number;
+  /** Maximum accumulation attempts to collect all companies */
+  maxAccumulationAttempts: number;
+  /** Delay between accumulation attempts (ms) */
+  accumulationDelayMs: number;
+}
+
+/**
+ * Result of fetching a single page.
+ */
+export interface PageFetchResult {
+  companies: KkrRawCompany[];
+  pagination: KkrPaginationMeta;
+}
+
+/**
+ * Result of fetching all pages.
+ */
+export interface AllPagesFetchResult {
+  companies: KkrRawCompany[];
+  totalHits: number;
+  totalPages: number;
+  fetchedPages: number;
+  accumulationAttempts: number;
 }

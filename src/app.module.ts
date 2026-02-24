@@ -14,11 +14,13 @@ import { AdminModule } from './admin/admin.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
+      // For environment variables
       isGlobal: true,
       validate: validateEnv,
     }),
-    ScheduleModule.forRoot(),
+    ScheduleModule.forRoot(), // For cron jobs
     ThrottlerModule.forRootAsync({
+      // for rate limiting
       inject: [ConfigService],
       useFactory: (configService: ConfigService<EnvConfig, true>) => [
         {
@@ -35,6 +37,7 @@ import { AdminModule } from './admin/admin.module';
             : undefined,
         level: process.env.LOG_LEVEL || 'info',
         redact: {
+          // For security - redacts sensitive information
           paths: ['req.headers.authorization', 'MONGO_URI', '*.MONGO_URI'],
           censor: '[REDACTED]',
         },
@@ -48,7 +51,7 @@ import { AdminModule } from './admin/admin.module';
   ],
   providers: [
     {
-      provide: APP_GUARD,
+      provide: APP_GUARD, // For rate limiting
       useClass: ThrottlerGuard,
     },
   ],
