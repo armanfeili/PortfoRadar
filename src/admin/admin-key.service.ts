@@ -33,7 +33,7 @@ export class AdminKeyService {
   ): Promise<AdminKeyResponseDto> {
     // Generate cryptographically secure random token
     const tokenBytes = randomBytes(32);
-    const token = `ak_${tokenBytes.toString('hex')}`;
+    const token = `ak_${tokenBytes.toString('hex')}`; // ak_ prefix for admin key
 
     // Hash the token for storage (never store plain token)
     const tokenHash = this.hashToken(token);

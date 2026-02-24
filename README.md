@@ -1,6 +1,7 @@
 # PortfoRadar
 
 [![CI](https://github.com/armanfeili/PortfoRadar/actions/workflows/ci.yml/badge.svg)](https://github.com/armanfeili/PortfoRadar/actions/workflows/ci.yml)
+[![CD](https://github.com/armanfeili/PortfoRadar/actions/workflows/cd.yml/badge.svg)](https://github.com/armanfeili/PortfoRadar/actions/workflows/cd.yml)
 
 A NestJS application that ingests and serves KKR's investment portfolio company data through a queryable REST API.
 

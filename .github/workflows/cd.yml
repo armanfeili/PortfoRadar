@@ -2,17 +2,17 @@ name: CD
 
 on:
   workflow_run:
-    workflows: ["CI"]
+    workflows: ["CI"] # Triggers when the CI workflow completes
     types:
-      - completed
+      - completed # Only runs when the CI workflow completes successfully
     branches:
       - main
       - master
   workflow_dispatch:
 
 concurrency:
-  group: cd-${{ github.ref }}
-  cancel-in-progress: true
+  group: cd-${{ github.ref }} # Ensures only one CD workflow runs at a time for a specific branch
+  cancel-in-progress: true # Cancels the previous workflow if a new one is started
 
 jobs:
   verify-deployment:
